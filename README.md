@@ -56,6 +56,10 @@ emulated Z80, inside the Spectrum display. The sheet starts blank, with columns
 cursor navigation scrolls the sheet. The font, selected cell, formula bar,
 keyboard editing and arithmetic all run in the native program.
 
+Example shopping sheet with quantities, prices, and calculated totals:
+
+![Spectrum Calc shopping sheet with five items, row formulas, and a SUM total of 35](Screenshots%20and%20Video/Calculator%20-%20Example.png)
+
 The light grid has visible cell boundaries and cyan headers that follow the
 selected row and column. The calculator interface is in English. Use **Edit,
 Clear, Copy, Help** or **Exit** in the on-screen toolbar. Click the selected
@@ -65,6 +69,10 @@ Enter. The controls below the grid jump by four columns or sixteen rows and
 show the visible range. Cell contents are inset from the grid lines for
 readability; longer values remain available in the formula bar.
 
+Editing the total formula in the yellow formula bar, with **Save** and **Cancel**:
+
+![Spectrum Calc editing the formula =SUM(D2:D6), with Save and Cancel controls visible](Screenshots%20and%20Video/Calculator%20-%20Editing.png)
+
 Use **arrows** to move, **Enter** to edit and confirm, and **Escape** to cancel
 an edit or return to the Spectrum menu. Type numbers, labels or formulas such as
 `=A2*B2` and `=SUM(C2:C10)`. Both decimal commas and points are accepted.
@@ -72,6 +80,10 @@ The program supports `+ - * /`, parentheses, cell references and rectangular
 `SUM`, `AVERAGE`, `MIN`, `MAX` and `COUNT` ranges, with English function names.
 **SS+E** (or **F4** on the PC) opens the native formula reference page.
 Cells hold up to 31 characters; numbers display up to two decimal places.
+
+The built-in formula reference, opened with **F4**:
+
+![Spectrum Calc formula reference showing aggregate functions, arithmetic, and cell reference syntax](Screenshots%20and%20Video/Calculator%20-%20Formula%20Reference.png)
 
 Click a cell to select it, then drag the small square at its bottom-right corner
 to fill other visible cells. References move with the copy: filling `=A2*B2`
