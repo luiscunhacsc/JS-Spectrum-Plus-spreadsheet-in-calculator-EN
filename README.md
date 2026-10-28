@@ -50,10 +50,6 @@ credits and theme music; press Space on the credits to enter the adventure.
 It demonstrates entry, formulas, copying, editing, navigation, help, and returning
 to the Spectrum menu.
 
-[Versão em português de Portugal](Screenshots%20and%20Video/Guia%20da%20Calculadora%20-%20PT-PT.mp4)
-(5:45, com narração, legendas e capítulos em português), com
-[transcrição](Screenshots%20and%20Video/Guia%20da%20Calculadora%20-%20PT-PT%20-%20Transcricao.txt).
-
 Choose **Calculator** in the built-in 128K menu to run **Spectrum Calc** on the
 emulated Z80, inside the Spectrum display. The sheet starts blank, with columns
 **A-H** and **64 rows**. Four columns and sixteen rows are visible at once;
