@@ -92,6 +92,39 @@ it through Tape Loader to run the program independently of the Calculator hook.
 See `developer/native-calc/README.md` for Spectrum keyboard shortcuts, limits,
 and rebuilding with z88dk.
 
+## 128K memory map and calculator location
+
+The emulator presents a 16-bit Z80 address space. The 128K Spectrum pages RAM
+into the upper address window; addresses below are CPU-visible addresses:
+
+| CPU address | Size | Backing memory |
+|---|---:|---|
+| `0000-3FFF` | 16 KB | Selected ROM (ROM 0 or ROM 1) |
+| `4000-7FFF` | 16 KB | RAM bank 5 |
+| `8000-BFFF` | 16 KB | RAM bank 2 |
+| `C000-FFFF` | 16 KB | Selected RAM bank (0-7) |
+
+When the built-in Calculator is selected, the emulator automatically copies the
+native Z80 program embedded in `index.html` into RAM at `5DC0` (24000), then
+starts executing it. ROM 1 and RAM bank 0 are paged in; the ROM is unchanged.
+
+![Spectrum Calc memory map showing the program loaded into RAM banks 5, 2 and 0, with ROM unchanged](Screenshots%20and%20Video/Spectrum%20Calc%20-%20Memory%20Map.png)
+
+Its linked image and working memory occupy `5DC0-F1A3` (the end address `F1A4`
+is exclusive), across these physical RAM banks:
+
+| CPU address range | Backing memory | Calculator contents |
+|---|---|---|
+| `5DC0-7FFF` | Bank 5, offsets `1DC0-3FFF` | Program start; `main` entry at `7F7F` |
+| `8000-BFFF` | Bank 2, offsets `0000-3FFF` | Program code/data; cell storage starts at `AAA3` |
+| `C000-F1A3` | Bank 0, offsets `0000-31A3` | Program data and working memory; cell bytes continue at `C000`, values start at `EAEA` |
+
+The source is in `developer/native-calc/` (`calc.c`, `fill.c`, and
+`screen.asm`). `program.json` contains the embedded image and linker addresses;
+`spectrum-calc.map` is the full linker map. The emulator and its memory paging
+and Calculator launch hook are in `developer/js_spectrum.html`. `index.html` is
+the generated standalone app.
+
 ## Keyboard
 
 - Click the emulator display to focus keyboard input.
