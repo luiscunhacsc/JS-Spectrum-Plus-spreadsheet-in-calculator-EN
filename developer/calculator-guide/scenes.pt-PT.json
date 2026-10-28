@@ -1,0 +1,148 @@
+[
+  {
+    "title": "Abrir a calculadora",
+    "body": "Abra o ficheiro index.html.\nEscolha Start 128K.\nClique no ecrã para usar\no teclado.\n\nNo menu do Spectrum,\nescolha Calculator.",
+    "code": "Baixo  Baixo  Enter",
+    "tip": "Este guia usa um teclado de PC.\nOs cliques do rato aparecem\nassinalados no vídeo.",
+    "minimum": 14,
+    "speech": [
+      "Abra o ficheiro index ponto H T M L no navegador, escolha Start 128 K e clique no ecrã para poder usar o teclado.",
+      "No menu do Spectrum, prima duas vezes a seta para baixo, até selecionar Calculator. Depois, prima Enter."
+    ]
+  },
+  {
+    "title": "Conhecer a folha",
+    "body": "Clique numa célula\npara a selecionar.\nAs setas movem a seleção.\nTab avança para a direita.\n\nOs cabeçalhos a azul-claro\nindicam a linha e a coluna.",
+    "code": "A1 = coluna A, linha 1",
+    "tip": "A barra FX mostra o conteúdo.\nUse os botões Editar, Limpar,\nCopiar, Ajuda e Sair.",
+    "minimum": 15,
+    "speech": [
+      "Cada quadrado é uma célula. Clique numa célula, ou use as teclas de direção, para a selecionar. Os cabeçalhos a azul-claro indicam a linha e a coluna atuais.",
+      "A barra F X mostra o conteúdo da célula selecionada. Na barra de ferramentas encontra os botões Editar, Limpar, Copiar, Ajuda e Sair."
+    ]
+  },
+  {
+    "title": "Escrever os títulos",
+    "body": "A1: ARTIGO\nB1: QTD\nC1: PRECO\nD1: TOTAL\n\nEscreva para iniciar.\nEnter confirma e desce uma linha.",
+    "code": "Escrever  ->  Enter",
+    "tip": "A barra FX fica amarela\nenquanto está a editar\numa célula.",
+    "minimum": 16,
+    "speech": [
+      "Vamos criar uma pequena lista de compras. Escreva Artigo em A um, a abreviatura Q T D em B um, Preço em C um e Total em D um.",
+      "Basta começar a escrever para iniciar uma nova entrada. Prima Enter para confirmar o conteúdo e passar à linha seguinte."
+    ]
+  },
+  {
+    "title": "Introduzir valores",
+    "body": "A2: CANETAS\nB2: 3        C2: 2,50\n\nA3: CADERNOS\nB3: 2        C3: 4,75\n\nPode usar vírgula ou ponto.",
+    "code": "3 x 2,50\n2 x 4,75",
+    "tip": "Clique na célula pretendida,\nescreva o valor\ne prima Enter.",
+    "minimum": 20,
+    "speech": [
+      "Na primeira linha de artigos, escreva Canetas em A dois, a quantidade três em B dois e o preço dois vírgula cinquenta em C dois.",
+      "Na linha três, escreva Cadernos, a quantidade dois e o preço quatro vírgula setenta e cinco.",
+      "Nos valores decimais, tanto pode usar vírgula como ponto. Neste exemplo, usamos vírgulas."
+    ]
+  },
+  {
+    "title": "Calcular um total",
+    "body": "Selecione D2 e escreva:\n\n=B2*C2\n\nPrima Enter.\nResultado no ecrã: 7.5",
+    "code": "=B2*C2",
+    "tip": "As fórmulas começam por =\nO asterisco * indica\numa multiplicação.",
+    "minimum": 13,
+    "speech": [
+      "Selecione D dois e escreva igual a B dois, asterisco, C dois. O asterisco serve para multiplicar. Depois, prima Enter.",
+      "O resultado é sete vírgula cinco. No ecrã, os resultados usam ponto decimal. Volte a selecionar D dois para ver a fórmula na barra F X. As fórmulas começam pelo sinal de igual."
+    ]
+  },
+  {
+    "title": "Copiar uma fórmula",
+    "body": "Selecione D2.\nArraste o pequeno quadrado\ndo canto inferior direito\naté D3.\n\nAs referências ajustam-se\nà nova linha.",
+    "code": "D2: =B2*C2\nD3: =B3*C3",
+    "tip": "A cópia substitui o conteúdo\nque já exista nas células\nde destino.",
+    "minimum": 15,
+    "speech": [
+      "Selecione D dois. Arraste o pequeno quadrado do canto inferior direito da célula até D três e largue o botão do rato.",
+      "A fórmula copiada passa a multiplicar B três por C três, dando nove vírgula cinco. As referências relativas ajustam-se automaticamente. A cópia substitui o conteúdo que já exista no destino."
+    ]
+  },
+  {
+    "title": "Somar os totais",
+    "body": "Escreva TOTAL em C4.\nEm D4, introduza:\n\n=SUM(D2:D3)\n\nO total geral é 17.",
+    "code": "=SUM(D2:D3)",
+    "tip": "Coloque a célula da soma\nfora do intervalo\nque pretende somar.",
+    "minimum": 15,
+    "speech": [
+      "Escreva o título Total em C quatro. Em D quatro, introduza igual a SUM, abre parênteses, D dois, dois pontos, D três, fecha parênteses.",
+      "Esta fórmula soma os dois totais e dá dezassete. A célula da soma deve ficar fora do próprio intervalo, para evitar uma referência circular."
+    ]
+  },
+  {
+    "title": "Editar ou cancelar",
+    "body": "Selecione B2 e clique na\nbarra FX ou no botão Editar.\n\nGuardar / Enter = confirmar\nCancelar / Escape = anular\n\nAltere a quantidade de 3 para 4.",
+    "code": "Novo total: 19,5",
+    "tip": "Backspace apaga um caráter.\nAs fórmulas são recalculadas\nautomaticamente.",
+    "minimum": 20,
+    "speech": [
+      "Para alterar o conteúdo existente, selecione a célula e clique na barra F X ou no botão Editar. A tecla Backspace apaga um caráter.",
+      "A barra amarela mostra a alteração em curso. O botão Cancelar, ou a tecla Escape, anula a edição. Primeiro, vamos cancelar uma alteração de teste, mantendo o valor original.",
+      "Agora altere B dois de três para quatro e escolha Guardar. As fórmulas são recalculadas e o total geral passa a dezanove vírgula cinco."
+    ]
+  },
+  {
+    "title": "Limpar uma célula",
+    "body": "Selecione primeiro a célula.\nClique em Limpar\nou prima Delete.\n\nAqui apagamos uma nota\ntemporária na célula A6.",
+    "code": "Limpar = apagar o conteúdo",
+    "tip": "Confirme o endereço\nda célula selecionada\nantes de a limpar.",
+    "minimum": 12,
+    "speech": [
+      "Para apagar o conteúdo de uma célula, selecione-a e clique em Limpar, ou prima Delete. Neste exemplo, escrevemos uma nota temporária em A seis e depois apagamo-la.",
+      "A lista de compras e as fórmulas mantêm-se. Confirme sempre o endereço da célula selecionada antes de a limpar."
+    ]
+  },
+  {
+    "title": "Navegar pela folha",
+    "body": "A folha tem as colunas A-H\ne 64 linhas.\n\n[<] [>] mudam de colunas.\nACIMA sobe 16 linhas.\nABAIXO desce 16 linhas.",
+    "code": "4 colunas e 16 linhas\nvisíveis de cada vez",
+    "tip": "O indicador por baixo da grelha\nmostra o intervalo de linhas\nque está no ecrã.",
+    "minimum": 15,
+    "speech": [
+      "A folha tem oito colunas, de A a H, e sessenta e quatro linhas. De cada vez, são visíveis quatro colunas e dezasseis linhas.",
+      "Use os controlos por baixo da grelha para mudar de colunas ou avançar dezasseis linhas. Acima permite subir e Abaixo permite descer. Os dados mantêm-se enquanto navega."
+    ]
+  },
+  {
+    "title": "Copiar pelo teclado",
+    "body": "Selecione a célula de origem.\nPrima F5 para iniciar a cópia.\nUse as setas para marcar o fim.\nEnter aplica; Escape cancela.\n\nTambém pode usar Copiar, clicar\nno destino e escolher Aplicar.",
+    "code": "F5  ->  Setas  ->  Enter",
+    "tip": "As referências relativas mudam.\n$A$1 mantém a coluna\ne a linha fixas.",
+    "minimum": 16,
+    "speech": [
+      "Para copiar pelo teclado, selecione a célula de origem e prima F cinco. Use as setas para escolher o canto final do destino. Enter aplica a cópia e Escape cancela-a.",
+      "Primeiro cancelamos; depois repetimos e aplicamos. Também pode usar Copiar, clicar no destino e escolher Aplicar. Os cifrões mantêm as referências fixas, como em cifrão A cifrão um."
+    ]
+  },
+  {
+    "title": "Consultar a ajuda",
+    "body": "Prima F4 ou clique em Ajuda.\n\nSUM       AVERAGE\nMIN       MAX       COUNT\n\nVolte à folha com Enter,\nEscape ou com o botão inferior.",
+    "code": "F4 = ajuda das fórmulas",
+    "tip": "Os nomes das funções\nsão escritos em inglês,\nmesmo na versão portuguesa.",
+    "minimum": 14,
+    "speech": [
+      "Prima F quatro, ou clique em Ajuda, para consultar as fórmulas disponíveis. Encontra SUM, AVERAGE, MIN, MAX e COUNT, com exemplos.",
+      "Os nomes das funções são escritos em inglês. Para voltar à folha, prima Enter ou Escape, ou clique no botão na parte inferior."
+    ]
+  },
+  {
+    "title": "Sair e regressar",
+    "body": "Sair / Escape permite voltar\nao menu do Spectrum.\n\nReabra Calculator para continuar\nna mesma sessão do navegador.\n\nMantenha a página aberta\npara conservar a folha.",
+    "code": "Guardar confirma a célula.\nNão guarda um ficheiro.",
+    "tip": "Recarregar ou fechar a página\napaga a folha. Esta versão não\nguarda ficheiros nem exporta CSV.",
+    "minimum": 18,
+    "speech": [
+      "Clique em Sair, ou prima Escape quando não estiver a editar, para voltar ao menu do Spectrum. Reabra Calculator para continuar com os mesmos dados, na mesma sessão do navegador.",
+      "Mantenha a página aberta. Recarregar ou fechar a página apaga a folha. Esta versão não guarda ficheiros nem exporta C S V. O botão Guardar apenas confirma a célula atual.",
+      "Já pode começar a criar a sua própria folha de cálculo."
+    ]
+  }
+]

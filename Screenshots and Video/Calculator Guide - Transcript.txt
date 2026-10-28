@@ -1,0 +1,41 @@
+SPECTRUM CALC - HOW TO USE IT
+English narration; recorded from the actual Z80 Calculator.
+
+00:00:00  Open Calculator
+Open index dot H T M L in your browser, select Start 128 K, then click the display to connect your keyboard. In the Spectrum menu, press Down twice to highlight Calculator, then press Enter.
+
+00:00:19  Find your way
+Each box is a cell. Click a cell, or use the arrow keys, to select it. The cyan headers show your current row and column. The F X bar shows the selected cell's contents. The toolbar provides Edit, Clear, Copy, Help, and Exit.
+
+00:00:40  Type some labels
+Let's build a small shopping list. Enter Item in A one, Quantity in B one, Price in C one, and Total in D one. We use Q T Y as a short label for Quantity. Typing starts a new entry. Press Enter to confirm it and move down one row.
+
+00:01:04  Enter the values
+For the first item, enter Pens in A two, a quantity of three in B two, and a price of two point five zero in C two. On row three, enter Notebooks, a quantity of two, and a price of four point seven five. You can use either a decimal point or a decimal comma.
+
+00:01:41  Calculate a total
+Select D two and type equals B two times C two. Use the asterisk for multiplication, then press Enter. The result is seven point five. Select D two again to see the saved formula in the F X bar. Every formula begins with an equals sign.
+
+00:02:01  Copy a formula
+Select D two. Drag the small square at its bottom-right corner down to D three, and release the mouse. The copied formula becomes B three times C three, giving nine point five. Relative references adjust automatically. Copying replaces any existing destination contents.
+
+00:02:22  Add a grand total
+Put the label Total in C four. In D four, enter equals SUM, open parenthesis, D two, colon, D three, close parenthesis. This adds both line totals and gives seventeen. Put the sum outside its own range to avoid a circular reference.
+
+00:02:43  Edit or cancel
+To edit existing contents, select a cell and click the F X bar, or choose Edit. Backspace removes a character. The yellow bar shows your pending entry. Cancel, or Escape, discards the edit. We first cancel a trial change, keeping the original value. Now change B two from three to four and choose Save. The formulas recalculate, and the grand total becomes nineteen point five.
+
+00:03:14  Clear a cell
+To erase a cell, select it and click Clear, or press Delete. Here we add and then clear a temporary note in A six. Our shopping list and its formulas stay in place. Always check the selected cell address before clearing.
+
+00:03:31  Explore the sheet
+The sheet has eight columns, A through H, and sixty-four rows. Four columns and sixteen rows are visible at a time. Use the controls below the grid to switch column pages or jump sixteen rows. The up and down buttons move by sixteen rows. Your data remains as you navigate.
+
+00:03:57  Keyboard copy
+For keyboard copying, select the source cell and press F five. Use the arrows to choose the destination corner. Enter applies the copy, and Escape cancels it. We first cancel, then repeat and apply. You can also use Copy, click the destination, and choose Apply. Dollar signs keep references fixed, as in dollar A dollar one.
+
+00:04:23  Open formula help
+Press F four, or click Help, to open the formula reference. It lists SUM, AVERAGE, MIN, MAX, and COUNT, with examples. Function names are in English. Return to the sheet with Enter, Escape, or the button at the bottom.
+
+00:04:43  Leave and return
+Click Exit, or press Escape outside an edit, to return to the Spectrum menu. Reopen Calculator to continue with your cells in the same browser session. Keep the page open. Reloading or closing it discards the sheet. This version has no file save or C S V export; Save only confirms the current cell. You are ready to build your own sheet.

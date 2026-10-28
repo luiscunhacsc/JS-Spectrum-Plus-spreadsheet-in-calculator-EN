@@ -1,0 +1,148 @@
+[
+  {
+    "title": "Open Calculator",
+    "body": "Open index.html.\nSelect Start 128K.\nClick the display to focus it.\n\nChoose Calculator\nin the Spectrum menu.",
+    "code": "Down  Down  Enter",
+    "tip": "This guide uses a PC keyboard.\nMouse clicks are highlighted.",
+    "minimum": 14,
+    "speech": [
+      "Open index dot H T M L in your browser, select Start 128 K, then click the display to connect your keyboard.",
+      "In the Spectrum menu, press Down twice to highlight Calculator, then press Enter."
+    ]
+  },
+  {
+    "title": "Find your way",
+    "body": "Click a cell to select it.\nArrows move the selection.\nTab moves right.\n\nCyan headers show\nyour current row and column.",
+    "code": "A1 = column A, row 1",
+    "tip": "Use Edit, Clear, Copy,\nHelp, and Exit in the toolbar.",
+    "minimum": 15,
+    "speech": [
+      "Each box is a cell. Click a cell, or use the arrow keys, to select it. The cyan headers show your current row and column.",
+      "The F X bar shows the selected cell's contents. The toolbar provides Edit, Clear, Copy, Help, and Exit."
+    ]
+  },
+  {
+    "title": "Type some labels",
+    "body": "A1: ITEM\nB1: QTY\nC1: PRICE\nD1: TOTAL\n\nTyping starts a new entry.\nEnter saves it and moves down.",
+    "code": "Type  ->  Enter",
+    "tip": "The yellow FX bar means\nyou are editing a cell.",
+    "minimum": 16,
+    "speech": [
+      "Let's build a small shopping list. Enter Item in A one, Quantity in B one, Price in C one, and Total in D one. We use Q T Y as a short label for Quantity.",
+      "Typing starts a new entry. Press Enter to confirm it and move down one row."
+    ]
+  },
+  {
+    "title": "Enter the values",
+    "body": "A2: PENS\nB2: 3        C2: 2.50\n\nA3: NOTEBOOKS\nB3: 2        C3: 4.75\n\nDecimals accept . or ,",
+    "code": "3 x 2.50\n2 x 4.75",
+    "tip": "Click the cell you want,\nthen type and press Enter.",
+    "minimum": 20,
+    "speech": [
+      "For the first item, enter Pens in A two, a quantity of three in B two, and a price of two point five zero in C two.",
+      "On row three, enter Notebooks, a quantity of two, and a price of four point seven five.",
+      "You can use either a decimal point or a decimal comma."
+    ]
+  },
+  {
+    "title": "Calculate a total",
+    "body": "Select D2 and type:\n\n=B2*C2\n\nPress Enter.\nThe result is 7.5.",
+    "code": "=B2*C2",
+    "tip": "Every formula starts with =\n* means multiplication.",
+    "minimum": 13,
+    "speech": [
+      "Select D two and type equals B two times C two. Use the asterisk for multiplication, then press Enter.",
+      "The result is seven point five. Select D two again to see the saved formula in the F X bar. Every formula begins with an equals sign."
+    ]
+  },
+  {
+    "title": "Copy a formula",
+    "body": "Select D2.\nDrag its small bottom-right\nsquare down to D3.\n\nThe references adjust\nto the new row.",
+    "code": "D2: =B2*C2\nD3: =B3*C3",
+    "tip": "Copying replaces the\ndestination cell's contents.",
+    "minimum": 15,
+    "speech": [
+      "Select D two. Drag the small square at its bottom-right corner down to D three, and release the mouse.",
+      "The copied formula becomes B three times C three, giving nine point five. Relative references adjust automatically. Copying replaces any existing destination contents."
+    ]
+  },
+  {
+    "title": "Add a grand total",
+    "body": "Put TOTAL in C4.\nIn D4, enter:\n\n=SUM(D2:D3)\n\nThe grand total is 17.",
+    "code": "=SUM(D2:D3)",
+    "tip": "Keep the SUM cell outside\nthe range it adds together.",
+    "minimum": 15,
+    "speech": [
+      "Put the label Total in C four. In D four, enter equals SUM, open parenthesis, D two, colon, D three, close parenthesis.",
+      "This adds both line totals and gives seventeen. Put the sum outside its own range to avoid a circular reference."
+    ]
+  },
+  {
+    "title": "Edit or cancel",
+    "body": "Select B2, then click FX\nor choose Edit.\n\nSave / Enter = confirm\nCancel / Escape = discard\n\nChange the quantity 3 to 4.",
+    "code": "New grand total: 19.5",
+    "tip": "Backspace removes a character.\nExisting formulas recalculate.",
+    "minimum": 20,
+    "speech": [
+      "To edit existing contents, select a cell and click the F X bar, or choose Edit. Backspace removes a character.",
+      "The yellow bar shows your pending entry. Cancel, or Escape, discards the edit. We first cancel a trial change, keeping the original value.",
+      "Now change B two from three to four and choose Save. The formulas recalculate, and the grand total becomes nineteen point five."
+    ]
+  },
+  {
+    "title": "Clear a cell",
+    "body": "Select the cell first.\nClick Clear, or press Delete.\n\nHere we remove a\ntemporary note in A6.",
+    "code": "Clear removes a cell's contents",
+    "tip": "Check the selected address\nbefore clearing a cell.",
+    "minimum": 12,
+    "speech": [
+      "To erase a cell, select it and click Clear, or press Delete. Here we add and then clear a temporary note in A six.",
+      "Our shopping list and its formulas stay in place. Always check the selected cell address before clearing."
+    ]
+  },
+  {
+    "title": "Explore the sheet",
+    "body": "The sheet has columns A-H\nand 64 rows.\n\n[<] [>] switch column pages.\nUP moves up 16 rows.\nDOWN moves down 16 rows.",
+    "code": "4 columns x 16 rows\nvisible at a time",
+    "tip": "The range indicator tells you\nwhich rows are on screen.",
+    "minimum": 15,
+    "speech": [
+      "The sheet has eight columns, A through H, and sixty-four rows. Four columns and sixteen rows are visible at a time.",
+      "Use the controls below the grid to switch column pages or jump sixteen rows. The up and down buttons move by sixteen rows. Your data remains as you navigate."
+    ]
+  },
+  {
+    "title": "Keyboard copy",
+    "body": "Select a source cell.\nPress F5 to begin copying.\nUse arrows to choose the end.\nEnter applies; Escape cancels.\n\nCopy also accepts a destination\nclick, then Apply.",
+    "code": "F5  ->  Arrows  ->  Enter",
+    "tip": "Relative references move.\n$A$1 stays fixed when copied.",
+    "minimum": 16,
+    "speech": [
+      "For keyboard copying, select the source cell and press F five. Use the arrows to choose the destination corner. Enter applies the copy, and Escape cancels it.",
+      "We first cancel, then repeat and apply. You can also use Copy, click the destination, and choose Apply. Dollar signs keep references fixed, as in dollar A dollar one."
+    ]
+  },
+  {
+    "title": "Open formula help",
+    "body": "Press F4, or click Help.\n\nSUM       AVERAGE\nMIN       MAX       COUNT\n\nReturn with Enter, Escape,\nor the bottom button.",
+    "code": "F4 = Formula reference",
+    "tip": "Function names are in English.\nThey work in formulas.",
+    "minimum": 14,
+    "speech": [
+      "Press F four, or click Help, to open the formula reference. It lists SUM, AVERAGE, MIN, MAX, and COUNT, with examples.",
+      "Function names are in English. Return to the sheet with Enter, Escape, or the button at the bottom."
+    ]
+  },
+  {
+    "title": "Leave and return",
+    "body": "Exit / Escape returns\nto the Spectrum menu.\n\nReopen Calculator to continue\nin the same browser session.\n\nKeep the page open\nto retain your sheet.",
+    "code": "Save confirms a cell.\nIt does not save a file.",
+    "tip": "Reloading or closing the page\ndiscards the sheet. This version\nhas no file save or CSV export.",
+    "minimum": 18,
+    "speech": [
+      "Click Exit, or press Escape outside an edit, to return to the Spectrum menu. Reopen Calculator to continue with your cells in the same browser session.",
+      "Keep the page open. Reloading or closing it discards the sheet. This version has no file save or C S V export; Save only confirms the current cell.",
+      "You are ready to build your own sheet."
+    ]
+  }
+]

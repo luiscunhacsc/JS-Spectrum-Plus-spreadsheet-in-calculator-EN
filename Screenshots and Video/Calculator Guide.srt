@@ -1,0 +1,220 @@
+1
+00:00:00,450 --> 00:00:09,120
+Open index dot H T M L in your browser, select Start 128
+K, then click the display to connect your
+
+2
+00:00:09,120 --> 00:00:09,533
+keyboard.
+
+3
+00:00:09,753 --> 00:00:15,796
+In the Spectrum menu, press Down twice to highlight
+Calculator, then press Enter.
+
+4
+00:00:20,330 --> 00:00:28,882
+Each box is a cell. Click a cell, or use the arrow keys,
+to select it. The cyan headers show your current
+
+5
+00:00:28,882 --> 00:00:30,048
+row and column.
+
+6
+00:00:30,268 --> 00:00:39,741
+The F X bar shows the selected cell's contents. The
+toolbar provides Edit, Clear, Copy, Help, and Exit.
+
+7
+00:00:40,970 --> 00:00:49,367
+Let's build a small shopping list. Enter Item in A one,
+Quantity in B one, Price in C one, and Total in D
+
+8
+00:00:49,367 --> 00:00:53,747
+one. We use Q T Y as a short label for Quantity.
+
+9
+00:00:53,967 --> 00:00:59,701
+Typing starts a new entry. Press Enter to confirm it and
+move down one row.
+
+10
+00:01:05,330 --> 00:01:13,013
+For the first item, enter Pens in A two, a quantity of
+three in B two, and a price of two point five zero
+
+11
+00:01:13,013 --> 00:01:13,973
+in C two.
+
+12
+00:01:14,193 --> 00:01:21,012
+On row three, enter Notebooks, a quantity of two, and a
+price of four point seven five.
+
+13
+00:01:21,232 --> 00:01:24,766
+You can use either a decimal point or a decimal comma.
+
+14
+00:01:41,690 --> 00:01:49,923
+Select D two and type equals B two times C two. Use the
+asterisk for multiplication, then press Enter.
+
+15
+00:01:50,143 --> 00:01:58,379
+The result is seven point five. Select D two again to
+see the saved formula in the F X bar. Every formula
+
+16
+00:01:58,379 --> 00:02:00,251
+begins with an equals sign.
+
+17
+00:02:01,490 --> 00:02:09,068
+Select D two. Drag the small square at its bottom-right
+corner down to D three, and release the mouse.
+
+18
+00:02:09,288 --> 00:02:18,014
+The copied formula becomes B three times C three, giving
+nine point five. Relative references adjust
+
+19
+00:02:18,014 --> 00:02:21,831
+automatically. Copying replaces any existing destination
+contents.
+
+20
+00:02:23,050 --> 00:02:33,892
+Put the label Total in C four. In D four, enter equals
+SUM, open parenthesis, D two, colon, D three, close
+
+21
+00:02:33,892 --> 00:02:34,408
+parenthesis.
+
+22
+00:02:34,628 --> 00:02:41,998
+This adds both line totals and gives seventeen. Put the
+sum outside its own range to avoid a circular
+
+23
+00:02:41,998 --> 00:02:42,386
+reference.
+
+24
+00:02:43,610 --> 00:02:51,996
+To edit existing contents, select a cell and click the F
+X bar, or choose Edit. Backspace removes a
+
+25
+00:02:51,996 --> 00:02:52,438
+character.
+
+26
+00:02:52,658 --> 00:03:01,640
+The yellow bar shows your pending entry. Cancel, or
+Escape, discards the edit. We first cancel a trial
+
+27
+00:03:01,640 --> 00:03:04,135
+change, keeping the original value.
+
+28
+00:03:04,355 --> 00:03:12,295
+Now change B two from three to four and choose Save. The
+formulas recalculate, and the grand total becomes
+
+29
+00:03:12,295 --> 00:03:13,548
+nineteen point five.
+
+30
+00:03:14,770 --> 00:03:22,538
+To erase a cell, select it and click Clear, or press
+Delete. Here we add and then clear a temporary note
+
+31
+00:03:22,538 --> 00:03:23,648
+in A six.
+
+32
+00:03:23,868 --> 00:03:31,026
+Our shopping list and its formulas stay in place. Always
+check the selected cell address before clearing.
+
+33
+00:03:32,250 --> 00:03:39,594
+The sheet has eight columns, A through H, and sixty-four
+rows. Four columns and sixteen rows are visible
+
+34
+00:03:39,594 --> 00:03:40,818
+at a time.
+
+35
+00:03:41,038 --> 00:03:48,567
+Use the controls below the grid to switch column pages
+or jump sixteen rows. The up and down buttons move
+
+36
+00:03:48,567 --> 00:03:51,956
+by sixteen rows. Your data remains as you navigate.
+
+37
+00:03:57,810 --> 00:04:05,745
+For keyboard copying, select the source cell and press F
+five. Use the arrows to choose the destination
+
+38
+00:04:05,745 --> 00:04:09,713
+corner. Enter applies the copy, and Escape cancels it.
+
+39
+00:04:09,933 --> 00:04:18,025
+We first cancel, then repeat and apply. You can also use
+Copy, click the destination, and choose Apply.
+
+40
+00:04:18,025 --> 00:04:22,970
+Dollar signs keep references fixed, as in dollar A
+dollar one.
+
+41
+00:04:24,170 --> 00:04:34,537
+Press F four, or click Help, to open the formula
+reference. It lists SUM, AVERAGE, MIN, MAX, and COUNT,
+
+42
+00:04:34,537 --> 00:04:35,628
+with examples.
+
+43
+00:04:35,848 --> 00:04:42,451
+Function names are in English. Return to the sheet with
+Enter, Escape, or the button at the bottom.
+
+44
+00:04:43,690 --> 00:04:50,978
+Click Exit, or press Escape outside an edit, to return
+to the Spectrum menu. Reopen Calculator to continue
+
+45
+00:04:50,978 --> 00:04:54,218
+with your cells in the same browser session.
+
+46
+00:04:54,438 --> 00:05:03,065
+Keep the page open. Reloading or closing it discards the
+sheet. This version has no file save or C S V
+
+47
+00:05:03,065 --> 00:05:05,940
+export; Save only confirms the current cell.
+
+48
+00:05:06,160 --> 00:05:08,784
+You are ready to build your own sheet.

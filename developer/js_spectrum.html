@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Spectrum — 128K</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #101214;
+            --panel: #191c1f;
+            --line: #303438;
+            --text: #eef0ed;
+            --muted: #9ba29f;
+            --accent: #b8e5cb;
+            --font-ui: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+        body { margin: 0; min-width: 300px; background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; -webkit-font-smoothing: antialiased; }
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+        button, a, summary, select, .canvas-wrapper { -webkit-tap-highlight-color: transparent; }
+        button:focus-visible, a:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+        button:disabled { opacity: .38; cursor: not-allowed; }
+        button, a, summary { touch-action: manipulation; }
+        .app-shell { width: min(1220px, 100%); margin: 0 auto; padding: 30px 36px 22px; }
+        .app-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 25px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+        .brand { display: flex; align-items: center; gap: 15px; }
+        .spectrum-mark { display: flex; width: 35px; height: 32px; overflow: hidden; transform: skew(-18deg); gap: 2px; }
+        .spectrum-mark i { flex: 1; background: #f16365; }
+        .spectrum-mark i:nth-child(2) { background: #f2d764; }
+        .spectrum-mark i:nth-child(3) { background: #77cb91; }
+        .spectrum-mark i:nth-child(4) { background: #6dc9e5; }
+        h1 { font-size: 23px; letter-spacing: -.8px; font-weight: 650; margin: 0; }
+        .brand p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+        .header-actions { display: flex; align-items: center; gap: 22px; }
+        .edition-label { color: #7e8783; font: 11px Consolas, monospace; letter-spacing: 1.5px; }
+        .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 294px; gap: 24px; align-items: start; }
+        .player-column { min-width: 0; }
+        .display-panel { overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; }
+        .display-heading { height: 51px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 20px; }
+        .display-label { display: flex; align-items: center; gap: 9px; color: #b6bdb9; font-size: 11px; letter-spacing: 1.3px; font-weight: 600; }
+        .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #727c76; flex: 0 0 auto; }
+        .is-running .display-label .status-dot { background: var(--accent); box-shadow: 0 0 8px #b8e5cb44; }
+        .display-spec { color: #78827d; font: 10px Consolas, monospace; letter-spacing: .4px; }
+        .display-stage { display: flex; align-items: center; justify-content: center; padding: 16px 20px 24px; background: #141719; }
+        .monitor-frame { position: relative; max-width: 100%; padding: 7px; border: 1px solid #333a36; border-radius: 5px; background: #080a09; box-shadow: 0 12px 32px #0005; }
+        .canvas-wrapper { position: relative; width: 512px; max-width: 100%; aspect-ratio: 4 / 3; overflow: hidden; outline: none; background: #050706; cursor: text; }
+        .canvas-wrapper:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+        canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+        .screen-idle { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; background: radial-gradient(ellipse at 50% 45%, #1c2620 0%, #080d0a 65%); }
+        .idle-cursor { display: grid; place-items: center; width: 35px; height: 41px; margin-bottom: 25px; background: var(--accent); color: #111b15; font: bold 29px Consolas, monospace; box-shadow: 5px 5px 0 #b8e5cb14; }
+        .eyebrow { margin: 0; color: #8eae9a; font: 10px Consolas, monospace; letter-spacing: 2px; }
+        .screen-idle h2 { margin: 12px 0 9px; font-size: clamp(18px, 2.1vw, 27px); font-weight: 500; letter-spacing: -.7px; }
+        .screen-idle p:last-child { margin: 0; color: #8e9d94; font-size: 12px; line-height: 1.6; }
+        .display-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 10px 12px; border-top: 1px solid #292d30; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 9px 12px; border: 1px solid #3b4240; border-radius: 7px; background: #282e2b; color: #e5eae6; font-size: 12px; font-weight: 550; line-height: 1.2; white-space: nowrap; transition: background .16s, border-color .16s, color .16s; }
+        .btn:hover:not(:disabled) { background: #363e39; border-color: #647168; }
+        .btn.quiet { background: transparent; border-color: transparent; color: #acb5ae; }
+        .btn.quiet:hover:not(:disabled) { background: #ffffff09; border-color: #ffffff0d; color: var(--text); }
+        .btn.primary { background: var(--accent); color: #17271d; border-color: var(--accent); }
+        .btn.primary:hover:not(:disabled) { background: #cff4df; border-color: #cff4df; }
+        .btn.toggle-active { background: #b8e5cb12; color: var(--accent); border-color: #b8e5cb3d; }
+        .icon { display: block; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+        .shortcut-badge, kbd { border: 1px solid #464e48; border-radius: 4px; background: #ffffff04; color: #9daaa0; padding: 2px 4px; font: 10px Consolas, monospace; }
+        .audio-toggle { margin-left: auto; }
+        .audio-toggle:not(.is-muted) { color: var(--accent); }
+        .audio-icon { width: 16px; height: 16px; flex: 0 0 auto; }
+        .status-bar { display: flex; align-items: flex-start; gap: 9px; min-height: 45px; padding: 13px 3px 10px; color: #a2ada5; font-size: 11px; line-height: 1.5; }
+        .status-bar .status-dot { margin-top: 5px; width: 5px; height: 5px; background: #66766b; }
+        .status-bar[data-tone='success'] .status-dot { background: var(--accent); }
+        .status-bar[data-tone='error'] { color: #ffa6a0; }
+        .status-bar[data-tone='error'] .status-dot { background: #ffa6a0; }
+        .tape-deck { position: relative; padding: 18px 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 13px; transition: border-color .16s; }
+        .tape-deck.is-dragging { border-color: var(--accent); background: #1e2c23; }
+        .deck-heading { display: flex; align-items: center; gap: 9px; margin-bottom: 15px; }
+        .deck-heading h2 { font-size: 13px; font-weight: 600; margin: 0; }
+        .deck-heading .icon { color: #a9b4ac; width: 19px; height: 19px; }
+        .file-type { margin-left: auto; color: #829087; font: 10px Consolas, monospace; letter-spacing: .7px; }
+        .tape-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .tape-controls #btnReset { margin-left: auto; }
+        .tape-info { display: flex; align-items: center; gap: 8px; min-width: 0; margin-top: 15px; font-size: 11px; color: #8e9b92; }
+        .tape-info .status-dot { width: 5px; height: 5px; }
+        .has-tape .tape-info .status-dot { background: var(--accent); }
+        #tapeName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .deck-hint { margin: 10px 0 0; color: #7f8c83; font-size: 11px; line-height: 1.6; }
+        .deck-hint code { color: #c1cdc4; font-family: Consolas, monospace; }
+        .machine-panel { min-width: 0; }
+        .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 1px 0 8px; }
+        .section-heading h2 { margin: 0; color: #d0d6d1; font-size: 13px; font-weight: 600; }
+        .section-index { color: #67766b; font: 10px Consolas, monospace; letter-spacing: 1px; }
+        .section-description { margin: 0 0 17px; color: #88958d; font-size: 11px; line-height: 1.5; }
+        .model-options { display: grid; gap: 12px; }
+        .model-choice { width: 100%; display: flex; flex-direction: column; text-align: left; color: var(--text); border: 1px solid #363e38; background: #1b201d; border-radius: 12px; padding: 15px 17px 0; overflow: hidden; transition: border-color .2s, background .2s; }
+        .model-choice:hover:not(:disabled) { border-color: #7d9f88; background: #222b25; }
+        .model-choice.is-selected { border-color: #91b99d; background: #202a23; }
+        .model-title { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .model-name { font-size: 13px; font-weight: 600; letter-spacing: -.15px; }
+        .model-memory { border: 1px solid #56634f; border-radius: 4px; padding: 3px 5px; color: #b7c5b7; font: 10px Consolas, monospace; }
+        .model-detail { display: block; margin-top: 5px; color: #84958a; font-size: 10px; }
+        .model-image-wrap { display: flex; align-items: center; justify-content: center; width: 100%; height: 126px; padding: 13px 0 8px; }
+        .model-icon { display: block; max-width: 100%; width: 220px; height: 100%; object-fit: contain; filter: drop-shadow(0 9px 6px #0005); transition: transform .2s; }
+        .model-choice:hover:not(:disabled) .model-icon { transform: translateY(-2px); }
+        .model-action { width: calc(100% + 34px); margin: 0 -17px; padding: 11px 17px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #ffffff0b; color: #b5c5b9; font-size: 11px; font-weight: 550; }
+        .model-choice.is-selected .model-action { color: var(--accent); background: #b8e5cb06; }
+        .model-action .icon { width: 14px; height: 14px; }
+        .rom-manual { border-top: 1px solid var(--line); margin-top: 19px; padding-top: 15px; color: #91a096; font-size: 11px; }
+        .rom-manual summary { cursor: pointer; padding: 4px 0; }
+        .rom-manual p { font-size: 11px; line-height: 1.6; color: #849087; margin: 10px 0; }
+        .rom-manual .btn { width: 100%; margin-top: 2px; }
+        input[type='file'] { display: none; }
+        .app-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid var(--line); margin-top: 27px; padding-top: 18px; color: #78867d; font-size: 10px; line-height: 1.7; }
+        .keyboard-help { display: flex; flex-wrap: wrap; gap: 15px; }
+        .keyboard-help span { white-space: nowrap; }
+        .focus-hint { display: flex; align-items: center; gap: 7px; color: #96aa9d; }
+        .overlay { position: absolute; inset: 0; background: #080c09ed; backdrop-filter: blur(5px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 20px; z-index: 10; }
+        .overlay img { max-width: 100%; max-height: 75%; border-radius: 5px; }
+        .overlay-hint { color: #b3c5b8; font-size: 12px; }
+        .samples-menu, .about-modal { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 22px; z-index: 50; background: #080a09c9; backdrop-filter: blur(7px); }
+        .dialog-card { width: min(520px, 100%); max-height: 85dvh; overflow: auto; padding: 25px; background: #1b201d; border: 1px solid #48554b; border-radius: 16px; box-shadow: 0 25px 80px #0007; }
+        .about-card { width: min(660px, 100%); line-height: 1.65; }
+        .dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 16px; }
+        .samples-menu-title, .about-title { font-size: 20px; font-weight: 550; letter-spacing: -.4px; margin: 0; }
+        .samples-label { display: block; color: #b0bdb3; font-size: 12px; margin-bottom: 10px; }
+        .samples-select { width: 100%; border: 1px solid #4d5d50; border-radius: 7px; background: #111713; color: var(--text); padding: 12px 10px; font-size: 13px; }
+        .samples-hint { color: #9aafa0; font-size: 12px; line-height: 1.7; margin: 17px 0 0; }
+        .samples-hint code { color: var(--accent); }
+        .about-card p { color: #b0bdb3; font-size: 13px; margin: 14px 0; }
+        .about-card a { color: var(--accent); overflow-wrap: anywhere; }
+        .about-close { margin-top: 8px; }
+        .is-large .workspace { grid-template-columns: minmax(0, 1fr); }
+        .is-large .machine-panel { max-width: 100%; }
+        .is-large .model-options { max-width: 360px; }
+        .is-large .model-image-wrap { height: 140px; }
+        .is-large .rom-manual .btn { width: auto; }
+        .monitor-frame:fullscreen, .monitor-frame:-webkit-full-screen, .monitor-frame.is-fullscreen { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; margin: 0; padding: 0; border: 0; border-radius: 0; display: grid; place-items: center; box-shadow: none !important; background: #000; }
+        .monitor-frame:fullscreen::backdrop { background: #000; }
+        .monitor-frame.is-fullscreen .canvas-wrapper, .monitor-frame:fullscreen .canvas-wrapper { border-radius: 0; max-width: 100vw; }
+        @media (min-width: 1400px) { .app-shell { padding-top: 40px; } .app-header { margin-bottom: 34px; } }
+        @media (max-width: 1050px) { .app-shell { padding: 24px; } .workspace { grid-template-columns: minmax(0, 1fr) 258px; gap: 20px; } .display-stage { padding: 14px 13px 20px; } .display-toolbar { padding: 8px; gap: 3px; } .display-toolbar .btn { padding: 8px; font-size: 11px; } .display-toolbar .shortcut-badge { display: none; } }
+        @media (max-width: 800px) { .app-shell { width: min(660px, 100%); padding: 20px; } .app-header { margin-bottom: 22px; padding-bottom: 20px; } .edition-label { display: none; } .workspace { grid-template-columns: minmax(0, 1fr); gap: 22px; } .machine-panel { grid-row: 1; } .model-options { grid-template-columns: minmax(0, 1fr); gap: 12px; } .model-image-wrap { height: 112px; } .section-description { margin-bottom: 13px; } .rom-manual { margin-top: 12px; padding-top: 8px; } .rom-manual .btn { width: auto; } .display-toolbar .shortcut-badge { display: inline; } .keyboard-help { gap: 10px; } }
+        @media (max-width: 440px) { .app-shell { padding: 20px 14px; } h1 { font-size: 21px; } .brand { gap: 12px; } .header-actions { gap: 0; } .brand p { font-size: 10px; } .header-actions .btn { padding: 8px; min-height: 36px; font-size: 11px; } .model-choice { padding: 12px 12px 0; } .model-name { font-size: 11px; } .model-memory { font-size: 9px; } .model-detail { font-size: 9px; } .model-image-wrap { height: 100px; padding: 10px 0 6px; } .model-action { width: calc(100% + 24px); margin: 0 -12px; padding: 10px 12px; font-size: 10px; } .model-options { gap: 9px; } .display-heading { padding: 0 14px; height: 43px; } .display-spec { font-size: 9px; } .display-stage { padding: 10px 10px 17px; } .display-toolbar .btn { padding: 8px 7px; gap: 5px; } .display-toolbar .shortcut-badge { display: none; } .screen-idle .idle-cursor { margin-bottom: 15px; width: 27px; height: 32px; font-size: 23px; } .screen-idle .eyebrow { font-size: 8px; } .screen-idle h2 { margin: 9px 0 6px; } .screen-idle p:last-child { font-size: 10px; } .tape-deck { padding: 16px; } .tape-controls .btn { padding-inline: 10px; font-size: 11px; } .keyboard-help { gap: 7px 12px; font-size: 9px; } .app-footer { margin-top: 22px; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+        @media (max-width: 440px) {
+            .display-toolbar { display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px; }
+            .display-toolbar .btn { justify-content: flex-start; min-height: 36px; }
+            .audio-toggle { margin-left: 0; }
+        }
+    </style>
+
+    <script> var module = {}; </script>
+    <script src="Z80.js"></script>
+    <script>
+        const Z80_CPU = (typeof Z80 === 'function') ? Z80 : (module.exports || window.Z80);
+        if (!Z80_CPU) alert("Critical Error: Z80.js not loaded.");
+    </script>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div class="brand">
+                <span class="spectrum-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <div><h1>JS Spectrum 128K</h1><p>Your Spectrum, in the browser.</p></div>
+            </div>
+            <div class="header-actions">
+                <span class="edition-label">128K</span>
+                <button id="btnAbout" class="btn quiet" type="button" aria-haspopup="dialog">About <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.3"/><path d="M10 9v5m0-8v.2"/></svg></button>
+            </div>
+        </header>
+
+        <main class="workspace">
+            <section class="player-column" aria-label="Emulator">
+                <div class="display-panel">
+                    <div class="display-heading">
+                        <span class="display-label"><i class="status-dot" aria-hidden="true"></i><span id="runState">DISPLAY / STANDBY</span></span>
+                        <span class="display-spec">256 &times; 192 &middot; 50 Hz</span>
+                    </div>
+                    <div class="display-stage">
+                        <div class="monitor-frame" id="monitor">
+                            <div class="canvas-wrapper" id="container" tabindex="0" role="group" aria-label="Spectrum display. Click here to use your keyboard." aria-describedby="keyboardHelp">
+                                <canvas id="screen" width="256" height="192" aria-label="ZX Spectrum screen"></canvas>
+                                <div id="screenIdle" class="screen-idle">
+                                    <span class="idle-cursor" aria-hidden="true">K</span>
+                                    <p class="eyebrow">READY WHEN YOU ARE</p>
+                                    <h2>A classic is waiting.</h2>
+                                    <p>Start your Spectrum 128K to power on.</p>
+                                </div>
+                                <div id="keyboardOverlay" class="overlay" hidden>
+                                    <img src="keyboard.jpg" alt="ZX Spectrum keyboard map showing the BASIC keywords and symbols on each key">
+                                    <button type="button" class="btn quiet overlay-hint" onclick="toggleKeyboard()">Close keyboard map <span class="shortcut-badge">F1</span></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="display-toolbar" role="group" aria-label="Display and audio controls">
+                        <button id="btnKeyboard" class="btn quiet" type="button" onclick="toggleKeyboard()" aria-pressed="false" title="Keyboard map (F1)"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M5 7h.1m3 0h.1m3 0h.1m3 0h.1M5 10h.1m3 0h.1m3 0h.1m3 0h.1M6 13h8"/></svg>Keyboard <span class="shortcut-badge">F1</span></button>
+                        <button id="btnLargeView" class="btn quiet" type="button" aria-pressed="false" title="Toggle large view (F3)"></button>
+                        <button id="btnFullscreen" class="btn quiet" type="button" onclick="toggleFullscreen()" title="Fullscreen (F2)"></button>
+                        <button class="btn quiet audio-toggle" id="btnAudio" type="button" aria-pressed="true" aria-label="Mute audio">
+                            <svg class="audio-icon" viewBox="0 0 20 20" aria-hidden="true"></svg><span id="audioButtonLabel">Audio on</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="status-bar" role="status" aria-live="polite" aria-atomic="true"><i class="status-dot" aria-hidden="true"></i><span id="statusMsg">Start the Spectrum 128K to begin.</span></div>
+
+                <section class="tape-deck" id="tapeDeck" aria-labelledby="tapeTitle">
+                    <div class="deck-heading">
+                        <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="4" width="16" height="12" rx="2"/><circle cx="6.5" cy="9" r="1.5"/><circle cx="13.5" cy="9" r="1.5"/><path d="m5 16 2-4h6l2 4M8 9h4"/></svg>
+                        <h2 id="tapeTitle">Tape deck</h2><span class="file-type">.TAP FILES</span>
+                    </div>
+                    <div class="tape-controls">
+                        <button class="btn primary" id="btnLoadTape" type="button" disabled onclick="document.getElementById('tapFile').click()"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3m-4 4 4-4 4 4M3 12v5h14v-5"/></svg>Load tape</button>
+                        <input type="file" id="tapFile" disabled accept=".tap,.TAP" aria-label="Choose a TAP tape file">
+                        <button id="btnSamples" class="btn" type="button" disabled aria-expanded="false" aria-haspopup="dialog" aria-controls="samplesMenu"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 6V4h6l2 2h8v10H2V6Z"/></svg>Sample games</button>
+                        <button id="btnReset" class="btn quiet" type="button" disabled title="Restart the Spectrum 128K"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 7a6.5 6.5 0 1 1-1 5M4 3v4h4"/></svg>Reset</button>
+                    </div>
+                    <div class="tape-info"><i class="status-dot" aria-hidden="true"></i><span id="tapeName">No tape inserted</span></div>
+                    <p class="deck-hint" id="tapeLoadHint">Insert a tape, then select <b>Tape Loader</b> in the Spectrum menu and press Enter.</p>
+                </section>
+            </section>
+
+            <aside class="machine-panel" aria-labelledby="machineTitle">
+                <div class="section-heading"><h2 id="machineTitle">Your Spectrum</h2><span class="section-index">128K</span></div>
+                <p class="section-description">128 KB RAM. AY sound. The iconic toastrack.</p>
+                <div class="model-options" role="group" aria-label="Spectrum 128K">
+                    <button class="model-choice" id="btnLoad128" type="button" aria-label="Start the 128K ZX Spectrum" aria-pressed="false">
+                        <span class="model-title"><span class="model-name">ZX Spectrum 128</span><span class="model-memory">128K</span></span>
+                        <span class="model-detail">The iconic toastrack</span>
+                        <span class="model-image-wrap"><img class="model-icon" src="assets/spectrum-128k.png" alt="" width="1802" height="872" decoding="async"></span>
+                        <span class="model-action"><span class="model-action-label">Start 128K</span><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5"/></svg></span>
+                    </button>
+                </div>
+                <details class="rom-manual">
+                    <summary>Use your own ROM</summary>
+                    <p>Select both 16 KB ROMs for the Spectrum 128K, ordered ROM 0 then ROM 1 by filename. ROM and ZIP files are supported.</p>
+                    <button class="btn" type="button" onclick="document.getElementById('romFile').click()">Choose ROM files</button>
+                    <input type="file" id="romFile" multiple accept=".rom,.zip" aria-label="Choose custom ROM files">
+                </details>
+            </aside>
+        </main>
+
+        <footer class="app-footer">
+            <div class="keyboard-help" id="keyboardHelp"><span><kbd>Ctrl</kbd> Caps Shift</span><span><kbd>Shift</kbd> Symbol Shift</span><span><kbd>&larr; &uarr; &darr; &rarr;</kbd> Cursor keys</span></div>
+            <span class="focus-hint" id="focusHint"><i class="status-dot" aria-hidden="true"></i>Click the display to type</span>
+        </footer>
+    </div>
+
+    <div id="samplesMenu" class="samples-menu" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="samplesTitle">
+        <div class="dialog-card">
+            <div class="dialog-heading"><h2 id="samplesTitle" class="samples-menu-title">A few classics to get you started.</h2><button id="btnSamplesClose" class="btn quiet" type="button" aria-label="Close sample games">&times;</button></div>
+            <label class="samples-label" for="sampleSelect">Choose a bundled game to insert:</label>
+            <select id="sampleSelect" class="samples-select"></select>
+            <p class="samples-hint">Once inserted, select <b>Tape Loader</b> from the Spectrum 128K menu and press Enter. You can also use <code>LOAD &quot;&quot;</code> from BASIC.</p>
+            <p class="samples-hint">When changing games, reset before loading. If a title screen pauses, press <kbd>Space</kbd> to continue.</p>
+        </div>
+    </div>
+    <div id="aboutModal" class="about-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+        <div class="dialog-card about-card">
+            <h2 id="aboutTitle" class="about-title">About This Emulator</h2>
+
+            <p><b>Author:</b> Luis Cunha, 2026.</p>
+            <p>This project is distributed under the <b>MIT License</b>.</p>
+            <p><b>Z80 microprocessor emulator core (`Z80.js`):</b> Copyright (c) <b>Molly Howell</b>.</p>
+            <p>
+                This emulator is dedicated to <b>Pedro Gimeno</b>, who first showed me the Turing machine principle in action on the day I saw
+                a fully functional ZX Spectrum replica on my PC-AT display. The 286 could only run it at about 50% speed, but it felt magical.
+                Pioneers like Pedro are often not recognized enough, and I want to openly manifest my respect and gratitude for his work.
+            </p>
+            <p>
+                For those who want to know more:
+                <a href="https://www.youtube.com/watch?v=zzWyqmLdeS8" target="_blank" rel="noopener noreferrer">
+                    https://www.youtube.com/watch?v=zzWyqmLdeS8
+                </a>
+            </p>
+            <button id="btnAboutClose" class="btn about-close" type="button">Close</button>
+        </div>
+    </div>
+
+<script>
+/**
+ * JS SPECTRUM PRO - LOW LATENCY AUDIO
+ * Fix: Synced visual loop to Audio Time to prevent buffering drift (Speedup).
+ */
+
+const ROM_SIZE = 0x4000;
+const RAM_BANK_COUNT = 8;
+const FRAME_TSTATES = 70908;
+const PALETTE_INT = [0xFF000000, 0xFFD70000, 0xFF0000D7, 0xFFD700D7, 0xFF00D700, 0xFFD7D700, 0xFF00D7D7, 0xFFD7D7D7, 0xFF000000, 0xFFFF0000, 0xFF0000FF, 0xFFFF00FF, 0xFF00FF00, 0xFFFFFF00, 0xFF00FFFF, 0xFFFFFFFF];
+const PALETTE_HEX = ['#000000', '#0000D7', '#D70000', '#D700D7', '#00D700', '#00D7D7', '#D7D700', '#D7D7D7', '#000000', '#0000FF', '#FF0000', '#FF00FF', '#00FF00', '#00FFFF', '#FFFF00', '#FFFFFF'];
+
+const ramBanks = Array.from({ length: RAM_BANK_COUNT }, () => new Uint8Array(ROM_SIZE));
+const EMBEDDED_ROM_BASE64 = {};
+let romBanks = [];
+let pagingLatch = 0;
+let pagingLocked = false;
+let z80 = null;
+let isRunning = false;
+let tapeBuffer = null;
+let tapeIndex = 0;
+let animationFrameId;
+let calculatorHookSupported = false;
+const NATIVE_CALC_PROGRAM = {};
+let nativeCalcProgram = NATIVE_CALC_PROGRAM;
+let nativeCalcContext = null;
+let nativeCalcExitRequested = false;
+let nativeCalcSavedCells = null;
+let nativeCalcRestorePending = false;
+const nativeCalcKeys = new Map();
+let nativeCalcMouse = null;
+const TAP_ONLY_MSG = 'Only TAP files are supported for now.';
+const DEFAULT_SAMPLE_TAPS = [
+    { name: 'EXOLON', path: 'TAPs/Exolon (1987)(Hewson)(48K-128K).tap', group: '128K favourites' },
+    { name: 'RoboCop', path: 'TAPs/RoboCop (1988)(Ocean)(48K-128K).tap', group: '128K favourites' },
+    { name: 'Target: Renegade', path: 'TAPs/Target Renegade (1988)(Imagine)(128K).tap', group: '128K favourites' },
+    { name: 'Head over Heels', path: 'TAPs/Head over Heels (1987)(Ocean)(48K-128K).tap', group: '128K favourites' },
+    { name: 'Cybernoid', path: 'TAPs/Cybernoid (1988)(Hewson)(128K).tap', group: '128K favourites' },
+    { name: 'Cybernoid II: The Revenge', path: 'TAPs/Cybernoid II (1988)(Hewson)(128K).tap', group: '128K favourites' },
+    { name: 'The NeverEnding Story (128K)', path: 'TAPs/The NeverEnding Story (1985)(Ocean)(128K).tap', group: 'Music pick' },
+    { name: 'Chuckie Egg', path: "TAPs/Chuckie Egg (1983)(A'n'F).tap", group: 'More classics' },
+    { name: 'Galaxians', path: 'TAPs/Galaxians (1982)(Artic Computing)(16K).tap', group: 'More classics' },
+    { name: 'Ikari Warriors', path: 'TAPs/Ikari Warriors (1988)(Elite Systems)(48K-128K).tap', group: 'More classics' },
+    { name: 'The Night Sky', path: 'TAPs/Night Sky, The (1983)(Bridge Software).tap', group: 'More classics' },
+    { name: 'Spy Hunter', path: 'TAPs/Spy Hunter (1985)(U.S. Gold)[cr Blood].tap', group: 'More classics' },
+    { name: 'Tetris', path: 'TAPs/tetris_release.tap', group: 'More classics' }
+];
+const EMBEDDED_TAP_BASE64 = {};
+
+// --- AUDIO SYSTEM ---
+let audioCtx = null;
+let audioGain = null;
+let audioMuted = false;
+let audioUnavailable = false;
+let nextAudioTime = 0;
+const AUDIO_SAMPLE_RATE = 44100;
+let speakerLog = [];
+let lastSpeakerState = 0;
+let ayLog = [];
+let ayRegister = 0;
+const AY_REGISTER_MASKS = [255, 15, 255, 15, 255, 15, 31, 255, 31, 31, 31, 255, 255, 15, 255];
+const ayRegisters = new Uint8Array(15);
+
+// AY-3-8912: three tone channels, a shared 17-bit noise generator and envelope.
+// Its clock is half the 128K CPU clock; the tone counters tick at clock / 8.
+class AY38912 {
+    constructor() { this.reset(); }
+    reset() {
+        this.registers = new Uint8Array(15);
+        this.toneCounters = [0, 0, 0];
+        this.tonePeriods = [1, 1, 1];
+        this.toneBits = [1, 1, 1];
+        this.noiseCounter = 0;
+        this.noisePeriod = 2;
+        this.noise = 0x1FFFF;
+        this.envelopeCounter = 0;
+        this.envelopePeriod = 2;
+        this.envelopeStep = 15;
+        this.attack = 0;
+        this.holding = true;
+        this.fraction = 0;
+    }
+    write(register, value) {
+        this.registers[register] = value & AY_REGISTER_MASKS[register];
+        const r = this.registers;
+        if (register < 6) {
+            const channel = register >> 1;
+            this.tonePeriods[channel] = (r[channel * 2] | (r[channel * 2 + 1] << 8)) || 1;
+        }
+        if (register === 6) this.noisePeriod = (r[6] || 1) * 2;
+        if (register === 11 || register === 12) this.envelopePeriod = ((r[11] | (r[12] << 8)) || 1) * 2;
+        if (register === 13) {
+            this.envelopeCounter = 0;
+            this.envelopeStep = 15;
+            this.attack = (value & 4) ? 15 : 0;
+            this.holding = false;
+        }
+    }
+    tick() {
+        const r = this.registers;
+        for (let channel = 0; channel < 3; channel++) {
+            if (++this.toneCounters[channel] >= this.tonePeriods[channel]) {
+                this.toneCounters[channel] = 0;
+                this.toneBits[channel] ^= 1;
+            }
+        }
+        if (++this.noiseCounter >= this.noisePeriod) {
+            this.noiseCounter = 0;
+            const feedback = (this.noise ^ (this.noise >> 3)) & 1;
+            this.noise = (this.noise >> 1) | (feedback << 16);
+        }
+        if (!this.holding && ++this.envelopeCounter >= this.envelopePeriod) {
+            this.envelopeCounter = 0;
+            if (--this.envelopeStep < 0) {
+                const shape = r[13];
+                if (!(shape & 8)) {
+                    this.envelopeStep = 0;
+                    this.attack = 0;
+                    this.holding = true;
+                } else if (shape & 1) {
+                    if (shape & 2) this.attack ^= 15;
+                    this.envelopeStep = 0;
+                    this.holding = true;
+                } else {
+                    if (shape & 2) this.attack ^= 15;
+                    this.envelopeStep = 15;
+                }
+            }
+        }
+    }
+    sample(tStates) {
+        this.fraction += tStates / 16;
+        while (this.fraction >= 1) { this.tick(); this.fraction--; }
+        let output = 0;
+        const r = this.registers;
+        for (let channel = 0; channel < 3; channel++) {
+            const tone = (r[7] & (1 << channel)) || this.toneBits[channel];
+            const noise = (r[7] & (8 << channel)) || (this.noise & 1);
+            const volume = r[8 + channel];
+            const level = (volume & 16) ? (this.envelopeStep ^ this.attack) : volume;
+            output += tone && noise ? AY_LEVELS[level] : 0;
+        }
+        return output / 3;
+    }
+}
+// Logarithmic DAC levels, normalized to leave headroom for the beeper.
+const AY_LEVELS = [0, 0.00999, 0.01445, 0.02106, 0.03070, 0.04555, 0.06450, 0.10736,
+    0.12659, 0.20499, 0.29221, 0.37284, 0.49253, 0.63532, 0.80558, 1];
+const ayChip = new AY38912();
+
+function enableAudio() {
+    if (!audioCtx) {
+        const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextConstructor) {
+            audioUnavailable = true;
+            updateAudioButton();
+            log('Audio is not supported by this browser.', 'error');
+            return;
+        }
+        audioCtx = new AudioContextConstructor({ sampleRate: AUDIO_SAMPLE_RATE });
+        audioGain = audioCtx.createGain();
+        audioGain.gain.value = audioMuted ? 0 : 0.10;
+        audioGain.connect(audioCtx.destination);
+        nextAudioTime = audioCtx.currentTime;
+    }
+
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch((error) => {
+            log(`Could not resume audio: ${error.message}`, 'error');
+        });
+    }
+}
+
+function updateAudioButton() {
+    const audioBtn = document.getElementById('btnAudio');
+    const label = document.getElementById('audioButtonLabel');
+    const muted = audioMuted || audioUnavailable;
+    audioBtn.classList.toggle('is-muted', muted);
+    audioBtn.setAttribute('aria-pressed', String(!muted));
+    audioBtn.setAttribute('aria-label', audioUnavailable ? 'Audio unavailable' : (muted ? 'Unmute audio' : 'Mute audio'));
+    label.textContent = audioUnavailable ? 'Audio unavailable' : (muted ? 'Audio muted' : 'Audio on');
+    audioBtn.disabled = audioUnavailable;
+    const speakerWave = audioBtn.querySelector('.audio-icon');
+    speakerWave.innerHTML = muted
+        ? '<path d="M3 8v4h3l4 3V5L6 8H3z" fill="currentColor"/><path d="m13 8 4 4m0-4-4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>'
+        : '<path d="M3 8v4h3l4 3V5L6 8H3z" fill="currentColor"/><path d="M13 7a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>';
+}
+
+function toggleAudioMute() {
+    enableAudio();
+    audioMuted = !audioMuted;
+    if (audioGain && audioCtx) {
+        audioGain.gain.setTargetAtTime(audioMuted ? 0 : 0.10, audioCtx.currentTime, 0.015);
+    }
+    updateAudioButton();
+    if (z80) container.focus();
+}
+
+function synthesizeAudioFrame(log, ayEvents = ayLog) {
+    const sampleCount = Math.floor(AUDIO_SAMPLE_RATE / 50);
+    const data = new Float32Array(sampleCount);
+    let logIdx = 0;
+    let ayIdx = 0;
+    let currentSpeaker = lastSpeakerState;
+    const frameLength = FRAME_TSTATES;
+    for (let i = 0; i < sampleCount; i++) {
+        const currentT = ((i + 1) / sampleCount) * frameLength;
+        while (logIdx < log.length && log[logIdx].t <= currentT) {
+            currentSpeaker = log[logIdx].val;
+            logIdx++;
+        }
+        // Advance to each write before applying it, retaining sub-frame timing.
+        const startT = (i / sampleCount) * frameLength;
+        let ayTime = startT;
+        while (ayIdx < ayEvents.length && ayEvents[ayIdx].t <= currentT) {
+            const event = ayEvents[ayIdx++];
+            ayChip.sample(Math.max(0, event.t - ayTime));
+            ayChip.write(event.register, event.value);
+            ayTime = Math.max(ayTime, event.t);
+        }
+        const ayOutput = ayChip.sample(Math.max(0, currentT - ayTime));
+        data[i] = (currentSpeaker ? 0.5 : -0.5) + ayOutput * 0.5;
+    }
+    // Writes in an instruction crossing the frame boundary belong to its end.
+    while (ayIdx < ayEvents.length) {
+        const event = ayEvents[ayIdx++];
+        ayChip.write(event.register, event.value);
+    }
+    if (log.length) currentSpeaker = log[log.length - 1].val;
+    lastSpeakerState = currentSpeaker;
+    return data;
+}
+
+function processAudioFrame(log) {
+    const data = synthesizeAudioFrame(log);
+    if (!audioCtx || audioCtx.state !== 'running') return;
+    const buffer = audioCtx.createBuffer(1, data.length, AUDIO_SAMPLE_RATE);
+    buffer.getChannelData(0).set(data);
+
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioGain);
+
+    // Tight Sync: If we fell behind, jump to now.
+    if (nextAudioTime < audioCtx.currentTime) nextAudioTime = audioCtx.currentTime;
+
+    source.start(nextAudioTime);
+    nextAudioTime += buffer.duration;
+}
+
+// --- EMULATOR CORE ---
+
+const keyboard = { 0xFEFE: 0x1F, 0xFDFE: 0x1F, 0xFBFE: 0x1F, 0xF7FE: 0x1F, 0xEFFE: 0x1F, 0xDFFE: 0x1F, 0xBFFE: 0x1F, 0x7FFE: 0x1F };
+const SCREEN_WIDTH = 256;
+const SCREEN_HEIGHT = 192;
+const DEFAULT_SCREEN_SCALE = 2;
+const canvas = document.getElementById('screen');
+const ctx = canvas.getContext('2d');
+const imgData = ctx.createImageData(SCREEN_WIDTH, SCREEN_HEIGHT);
+const pixels = new Uint32Array(imgData.data.buffer);
+const monitor = document.getElementById('monitor');
+const container = document.getElementById('container');
+const btnLargeView = document.getElementById('btnLargeView');
+const btnFullscreen = document.getElementById('btnFullscreen');
+const btnSamples = document.getElementById('btnSamples');
+const samplesMenu = document.getElementById('samplesMenu');
+const sampleSelect = document.getElementById('sampleSelect');
+const btnSamplesClose = document.getElementById('btnSamplesClose');
+const btnAbout = document.getElementById('btnAbout');
+const aboutModal = document.getElementById('aboutModal');
+const btnAboutClose = document.getElementById('btnAboutClose');
+let sampleCatalog = [];
+let displayMode = 'default';
+
+function updateMachineStatus() {
+    const button = document.getElementById('btnLoad128');
+    button.classList.toggle('is-selected', !!z80);
+    button.setAttribute('aria-pressed', String(!!z80));
+    button.querySelector('.model-action-label').textContent = z80 ? 'Running' : 'Start 128K';
+    button.setAttribute('aria-label', z80 ? 'Restart the 128K ZX Spectrum' : 'Start the 128K ZX Spectrum');
+    document.body.classList.toggle('is-running', !!z80);
+    document.getElementById('screenIdle').hidden = !!z80;
+    document.getElementById('runState').textContent = z80 ? '128K / RUNNING' : 'DISPLAY / STANDBY';
+}
+
+function getFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement;
+}
+
+function setDisplayScale(scale) {
+    container.style.width = `${SCREEN_WIDTH * scale}px`;
+    container.style.height = `${SCREEN_HEIGHT * scale}px`;
+}
+
+function getMaxWindowedScale() {
+    const stage = document.querySelector('.display-stage');
+    const style = getComputedStyle(stage);
+    const targetWidth = stage.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 16;
+    return Math.max(0.1, targetWidth / SCREEN_WIDTH);
+}
+
+function getLargeWindowedScale() {
+    const widthScale = getMaxWindowedScale();
+    const heightScale = Math.max(DEFAULT_SCREEN_SCALE, Math.floor((window.innerHeight - 220) / SCREEN_HEIGHT));
+    const integerScale = Math.floor(Math.min(widthScale, heightScale));
+    return widthScale < 1 ? widthScale : Math.max(1, integerScale);
+}
+
+function updateLargeViewButton() {
+    const isLargeMode = displayMode === 'large';
+    btnLargeView.classList.toggle('toggle-active', isLargeMode);
+    btnLargeView.setAttribute('aria-pressed', String(isLargeMode));
+    btnLargeView.innerHTML = `<svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="3" width="16" height="14" rx="1.5"/><path d="M2 7h16"/></svg>${isLargeMode ? 'Normal view' : 'Large view'} <span class="shortcut-badge">F3</span>`;
+}
+
+function updateLargeViewButtonState(isFullscreenActive) {
+    if (isFullscreenActive) {
+        btnLargeView.disabled = true;
+        btnLargeView.classList.remove('toggle-active');
+        btnLargeView.setAttribute('aria-pressed', 'false');
+        return;
+    }
+
+    btnLargeView.disabled = false;
+    updateLargeViewButton();
+}
+
+function toggleLargeView() {
+    if (getFullscreenElement() === monitor) return;
+    displayMode = (displayMode === 'large') ? 'default' : 'large';
+    document.body.classList.toggle('is-large', displayMode === 'large');
+    updateLargeViewButton();
+    syncDisplayScale();
+    container.focus();
+}
+
+function syncDisplayScale() {
+    if (getFullscreenElement() === monitor) {
+        const targetWidth = monitor.clientWidth || window.innerWidth;
+        const targetHeight = monitor.clientHeight || window.innerHeight;
+        const maxScale = Math.floor(Math.min(targetWidth / SCREEN_WIDTH, targetHeight / SCREEN_HEIGHT));
+        setDisplayScale(maxScale >= 1 ? maxScale : Math.min(targetWidth / SCREEN_WIDTH, targetHeight / SCREEN_HEIGHT));
+    } else {
+        const fitScale = getMaxWindowedScale();
+        const nextScale = displayMode === 'large' ? getLargeWindowedScale() : Math.min(DEFAULT_SCREEN_SCALE, fitScale);
+        setDisplayScale(nextScale);
+    }
+}
+
+async function toggleFullscreen() {
+    try {
+        if (getFullscreenElement() === monitor) {
+            if (document.exitFullscreen) await document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        } else {
+            if (monitor.requestFullscreen) await monitor.requestFullscreen();
+            else if (monitor.webkitRequestFullscreen) monitor.webkitRequestFullscreen();
+        }
+    } catch (err) {
+        log(`Fullscreen failed: ${err.message}`, 'error');
+    }
+}
+
+function toggleKeyboard() {
+    const overlay = document.getElementById('keyboardOverlay');
+    overlay.hidden = !overlay.hidden;
+    document.getElementById('btnKeyboard').setAttribute('aria-pressed', String(!overlay.hidden));
+    releaseAllKeys();
+    if (overlay.hidden) container.focus();
+    else overlay.querySelector('button').focus();
+}
+
+function openAbout() {
+    releaseAllKeys();
+    aboutModal.hidden = false;
+    aboutModal.classList.add('active');
+    aboutModal.setAttribute('aria-hidden', 'false');
+    btnAboutClose.focus();
+}
+
+function closeAbout() {
+    aboutModal.classList.remove('active');
+    aboutModal.setAttribute('aria-hidden', 'true');
+    aboutModal.hidden = true;
+    btnAbout.focus();
+}
+
+function log(msg, type) {
+    const el = document.getElementById('statusMsg');
+    el.innerText = msg;
+    el.parentElement.dataset.tone = type || 'normal';
+}
+
+function getRamBankForAddress(addr) {
+    if (addr < 0x8000) return 5;
+    if (addr < 0xC000) return 2;
+    return pagingLatch & 7;
+}
+
+function readMemory(addr) {
+    if (addr < 0x4000) return romBanks[(pagingLatch >> 4) & 1][addr];
+    const bank = getRamBankForAddress(addr);
+    return ramBanks[bank][addr & 0x3FFF];
+}
+
+function writeMemory(addr, value) {
+    if (addr >= 0x4000) {
+        const bank = getRamBankForAddress(addr);
+        ramBanks[bank][addr & 0x3FFF] = value;
+    }
+}
+
+function page128KMemory(value) {
+    if (pagingLocked) return;
+    pagingLatch = value & 0x3F;
+    pagingLocked = (pagingLatch & 0x20) !== 0;
+}
+
+function readKeyboardPort(port) {
+    if (port & 0x0001) return 0xFF;
+
+    const rowSelect = (port >> 8) & 0xFF;
+    let result = 0x1F;
+    for (const rowAddress in keyboard) {
+        const row = (parseInt(rowAddress, 10) >> 8) & 0xFF;
+        if ((rowSelect & (~row & 0xFF)) === 0) result &= keyboard[rowAddress];
+    }
+    return result | 0xA0;
+}
+
+function readPort(port) {
+    if (nativeCalcMouse && (port === 0xFBDF || port === 0xFFDF || port === 0xFADF)) {
+        const mouse = nativeCalcMouse;
+        // Kempston counters move in bounded steps so its native driver can
+        // follow a pointer that jumps across a scaled browser canvas.
+        if (port === 0xFBDF) {
+            const step = Math.max(-63, Math.min(63, mouse.targetX - mouse.x));
+            mouse.x += step; mouse.rawX = (mouse.rawX + step) & 255;
+            return mouse.rawX;
+        }
+        if (port === 0xFFDF) {
+            const step = Math.max(-63, Math.min(63, mouse.targetY - mouse.y));
+            mouse.y += step; mouse.rawY = (mouse.rawY - step) & 255;
+            return mouse.rawY;
+        }
+        if (mouse.x === mouse.targetX && mouse.y === mouse.targetY) {
+            mouse.reported = mouse.cancelled ? 0xFE : (mouse.left ? 0xFD : 0xFF);
+            mouse.cancelled = false;
+        }
+        return mouse.reported;
+    }
+    if ((port & 0xC002) === 0xC000) {
+        // The serial/keypad socket is disconnected, so its input pins stay high.
+        if (ayRegister === 14) return (ayRegisters[7] & 0x40) ? ayRegisters[14] : 0xFF;
+        return ayRegister < 15 ? ayRegisters[ayRegister] : 0xFF;
+    }
+    // An absent Kempston joystick must report no pressed directions/buttons.
+    if ((port & 0x00FF) === 0x1F) return 0;
+    return readKeyboardPort(port);
+}
+
+function writePort(port, val) {
+    // Optional exit notification; real hardware ignores this unclaimed port.
+    if (nativeCalcContext && port === 0x00EF && val === 0xA5) {
+        nativeCalcExitRequested = true;
+        return;
+    }
+    if ((port & 0xC002) === 0xC000) ayRegister = val & 15;
+    if ((port & 0xC002) === 0x8000 && ayRegister < 15) {
+        const value = val & AY_REGISTER_MASKS[ayRegister];
+        ayRegisters[ayRegister] = value;
+        ayLog.push({ t: frameTStates, register: ayRegister, value });
+    }
+    if ((port & 0xC002) === 0x4000 && (port & 0x00FF) === 0x00FD) page128KMemory(val);
+    if ((port & 1) === 0) {
+        speakerLog.push({ t: frameTStates, val: (val >> 4) & 1 });
+        monitor.style.borderColor = PALETTE_HEX[val & 7];
+    }
+}
+
+async function extractRomFilesFromZip(file) {
+    const archive = new Uint8Array(await file.arrayBuffer());
+    const view = new DataView(archive.buffer, archive.byteOffset, archive.byteLength);
+    let eocdOffset = -1;
+    const searchStart = Math.max(0, archive.length - 0x10016);
+    for (let offset = archive.length - 22; offset >= searchStart; offset--) {
+        if (view.getUint32(offset, true) === 0x06054B50) {
+            eocdOffset = offset;
+            break;
+        }
+    }
+    if (eocdOffset < 0) throw new Error(`${file.name} is not a valid ZIP archive.`);
+
+    const entryCount = view.getUint16(eocdOffset + 10, true);
+    let entryOffset = view.getUint32(eocdOffset + 16, true);
+    const romFiles = [];
+    for (let entry = 0; entry < entryCount; entry++) {
+        if (view.getUint32(entryOffset, true) !== 0x02014B50) {
+            throw new Error(`${file.name} contains an invalid ZIP directory.`);
+        }
+        const method = view.getUint16(entryOffset + 10, true);
+        const compressedSize = view.getUint32(entryOffset + 20, true);
+        const uncompressedSize = view.getUint32(entryOffset + 24, true);
+        const nameLength = view.getUint16(entryOffset + 28, true);
+        const extraLength = view.getUint16(entryOffset + 30, true);
+        const commentLength = view.getUint16(entryOffset + 32, true);
+        const localHeaderOffset = view.getUint32(entryOffset + 42, true);
+        const name = new TextDecoder().decode(archive.subarray(entryOffset + 46, entryOffset + 46 + nameLength));
+        entryOffset += 46 + nameLength + extraLength + commentLength;
+        if (!/\.rom$/i.test(name)) continue;
+
+        if (view.getUint32(localHeaderOffset, true) !== 0x04034B50) {
+            throw new Error(`${name} has an invalid ZIP entry header.`);
+        }
+        const localNameLength = view.getUint16(localHeaderOffset + 26, true);
+        const localExtraLength = view.getUint16(localHeaderOffset + 28, true);
+        const dataOffset = localHeaderOffset + 30 + localNameLength + localExtraLength;
+        const compressed = archive.subarray(dataOffset, dataOffset + compressedSize);
+        let bytes;
+        if (method === 0) {
+            bytes = compressed.slice();
+        } else if (method === 8 && typeof DecompressionStream !== 'undefined') {
+            const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+            bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+        } else if (method === 8) {
+            throw new Error('This browser cannot decompress ROM ZIP files. Extract the ROMs and select the .rom files.');
+        } else {
+            throw new Error(`${name} uses an unsupported ZIP compression method.`);
+        }
+        if (bytes.length !== uncompressedSize) throw new Error(`${name} has an invalid uncompressed size.`);
+        romFiles.push({ name, bytes });
+    }
+    if (!romFiles.length) throw new Error(`${file.name} does not contain a .rom file.`);
+    return romFiles;
+}
+
+async function readRomFiles(files) {
+    const romFiles = [];
+    for (const file of [...files].sort((a, b) => a.name.localeCompare(b.name))) {
+        if (/\.zip$/i.test(file.name)) {
+            romFiles.push(...await extractRomFilesFromZip(file));
+        } else {
+            romFiles.push({ name: file.name, bytes: new Uint8Array(await file.arrayBuffer()) });
+        }
+    }
+    romFiles.sort((a, b) => a.name.localeCompare(b.name));
+    validate128KRomSet(romFiles);
+    return romFiles;
+}
+
+function validate128KRomSet(romFiles) {
+    if (romFiles.length !== 2) {
+        throw new Error('Select both 16 KB ROMs for the Spectrum 128K (ROM 0 and ROM 1).');
+    }
+    if (romFiles.some((rom) => rom.bytes.length !== ROM_SIZE)) {
+        throw new Error('Each 128K ROM must be exactly 16 KB.');
+    }
+}
+
+function loadRomSet(romFiles) {
+    validate128KRomSet(romFiles);
+    ramBanks.forEach((bank) => bank.fill(0));
+    pagingLatch = 0;
+    pagingLocked = false;
+
+    romBanks = romFiles.map((rom) => rom.bytes);
+    nativeCalcContext = null;
+    nativeCalcMouse = null;
+    canvas.style.cursor = '';
+    // Only intercept the bundled ROM's Calculator entry and known menu loop.
+    const calculatorEntry = [0x21, 0x0D, 0xEC, 0xCB, 0xEE, 0xCB, 0xE6, 0xCB, 0xB6, 0xCD, 0xBE, 0x28];
+    const menuLoop = [0x31, 0xFF, 0x5B, 0xCD, 0x68, 0x36, 0xCD, 0x7F, 0x36];
+    const menuEntry = [0xCD, 0xEC, 0x29, 0x21, 0x0D, 0xEC, 0xCB, 0xCE, 0x2B, 0x36, 0x00];
+    calculatorHookSupported = !!nativeCalcProgram.base64 && calculatorEntry.every((byte, i) => romBanks[0][0x2885 + i] === byte) &&
+        menuLoop.every((byte, i) => romBanks[0][0x2653 + i] === byte) &&
+        menuEntry.every((byte, i) => romBanks[0][0x2704 + i] === byte);
+}
+
+async function loadBuiltIn128K() {
+    const button = document.getElementById('btnLoad128');
+    button.disabled = true;
+    try {
+        enableAudio();
+    } catch (error) {
+        audioUnavailable = true;
+        updateAudioButton();
+        log(`Could not initialize audio: ${error.message}`, 'error');
+    }
+    isRunning = false;
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    log('Loading 128K ROMs...', 'normal');
+
+    try {
+        let romFiles;
+        if (EMBEDDED_ROM_BASE64['128-0.rom'] && EMBEDDED_ROM_BASE64['128-1.rom']) {
+            romFiles = ['128-0.rom', '128-1.rom'].map((name) => ({
+                name,
+                bytes: decodeBase64ToBytes(EMBEDDED_ROM_BASE64[name])
+            }));
+        } else {
+            const archivePaths = ['ZX%20Spectrum%20128/128-0.rom.zip', 'ZX%20Spectrum%20128/128-1.rom.zip'];
+            const archives = await Promise.all(archivePaths.map(async (path) => {
+                if (EMBEDDED_ROM_BASE64[path]) {
+                    const bytes = decodeBase64ToBytes(EMBEDDED_ROM_BASE64[path]);
+                    return { name: path.split('/').pop(), arrayBuffer: async () => bytes.buffer };
+                }
+                const response = await fetch(path);
+                if (!response.ok) throw new Error(`Could not load ${path} (HTTP ${response.status}).`);
+                const bytes = await response.arrayBuffer();
+                return { name: path.split('/').pop(), arrayBuffer: async () => bytes };
+            }));
+            romFiles = await readRomFiles(archives);
+        }
+
+        await prepareNativeCalculator();
+        loadRomSet(romFiles);
+        initZ80();
+    } catch (err) {
+        log(`Could not start 128K: ${err.message}`, 'error');
+    } finally {
+        button.disabled = false;
+    }
+}
+
+function decodeBase64ToBytes(base64) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+}
+
+function isTapFileName(fileName) {
+    return /\.tap$/i.test(fileName || '');
+}
+
+function setTapeBuffer(arrayBuffer, sourceLabel = 'Tape') {
+    tapeBuffer = arrayBuffer;
+    tapeIndex = 0;
+    document.getElementById('tapeName').textContent = sourceLabel;
+    document.getElementById('tapeName').title = sourceLabel;
+    document.getElementById('tapeDeck').classList.add('has-tape');
+    log(`${sourceLabel} loaded. Select Tape Loader in the Spectrum menu and press Enter.`, 'success');
+}
+
+function getSampleCatalog() {
+    const embeddedPaths = Object.keys(EMBEDDED_TAP_BASE64);
+    if (embeddedPaths.length > 0) {
+        const knownPaths = new Set(DEFAULT_SAMPLE_TAPS.map((sample) => sample.path));
+        return DEFAULT_SAMPLE_TAPS.filter((sample) => embeddedPaths.includes(sample.path)).concat(embeddedPaths
+            .filter((path) => !knownPaths.has(path))
+            .sort((a, b) => a.localeCompare(b))
+            .map((path) => ({ name: path.split('/').pop(), path, group: 'More classics' })));
+    }
+    return DEFAULT_SAMPLE_TAPS;
+}
+
+function encodeSamplePath(path) {
+    return path.split('/').map(encodeURIComponent).join('/');
+}
+
+async function loadSampleTap(sample) {
+    try {
+        let arrayBuffer;
+        if (EMBEDDED_TAP_BASE64[sample.path]) {
+            const bytes = decodeBase64ToBytes(EMBEDDED_TAP_BASE64[sample.path]);
+            arrayBuffer = bytes.buffer;
+        } else {
+            const response = await fetch(encodeSamplePath(sample.path));
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            arrayBuffer = await response.arrayBuffer();
+        }
+
+        setTapeBuffer(arrayBuffer, `Sample "${sample.name}"`);
+        return true;
+    } catch (err) {
+        log(`Failed to load sample: ${err.message}`, 'error');
+        return false;
+    }
+}
+
+function renderSamplesMenu() {
+    sampleCatalog = getSampleCatalog();
+    sampleSelect.innerHTML = '';
+
+    if (!sampleCatalog.length) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'No TAP samples found';
+        sampleSelect.appendChild(option);
+        sampleSelect.disabled = true;
+        log('No sample TAP files available.', 'error');
+        return;
+    }
+
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Choose a sample...';
+    sampleSelect.appendChild(placeholderOption);
+
+    const groups = new Map();
+    for (const sample of sampleCatalog) {
+        const label = sample.group || 'More classics';
+        if (!groups.has(label)) {
+            const group = document.createElement('optgroup');
+            group.label = label;
+            groups.set(label, group);
+            sampleSelect.appendChild(group);
+        }
+        const option = document.createElement('option');
+        option.value = sample.path;
+        option.textContent = sample.name;
+        groups.get(label).appendChild(option);
+    }
+
+    sampleSelect.value = '';
+    sampleSelect.disabled = false;
+}
+
+function openSamplesMenu() {
+    renderSamplesMenu();
+    releaseAllKeys();
+    samplesMenu.hidden = false;
+    samplesMenu.classList.add('active');
+    samplesMenu.setAttribute('aria-hidden', 'false');
+    btnSamples.setAttribute('aria-expanded', 'true');
+    sampleSelect.focus();
+}
+
+function closeSamplesMenu() {
+    samplesMenu.classList.remove('active');
+    samplesMenu.setAttribute('aria-hidden', 'true');
+    btnSamples.setAttribute('aria-expanded', 'false');
+    samplesMenu.hidden = true;
+}
+
+function toggleSamplesMenu() {
+    if (samplesMenu.classList.contains('active')) {
+        closeSamplesMenu();
+    } else {
+        openSamplesMenu();
+    }
+}
+
+async function handleSampleSelection() {
+    const selectedPath = sampleSelect.value;
+    if (!selectedPath) return;
+
+    const selectedSample = sampleCatalog.find((sample) => sample.path === selectedPath);
+    if (!selectedSample) {
+        log('Invalid sample selection.', 'error');
+        return;
+    }
+
+    const loaded = await loadSampleTap(selectedSample);
+    if (loaded) {
+        closeSamplesMenu();
+        container.focus();
+    }
+}
+
+function initZ80() {
+    z80 = new Z80_CPU({
+        mem_read: readMemory,
+        mem_write: writeMemory,
+        io_read: readPort,
+        io_write: writePort
+    });
+
+    log('128K ROMs loaded.', 'success');
+    updateMachineStatus();
+    document.getElementById('btnReset').disabled = false;
+    document.getElementById('tapFile').disabled = false;
+    document.getElementById('btnLoadTape').disabled = false;
+    document.getElementById('btnSamples').disabled = false;
+    resetSystem();
+}
+
+function resetSystem() {
+    if(!z80) return;
+    if (nativeCalcContext) finishNativeCalculator();
+    nativeCalcContext = null;
+    nativeCalcExitRequested = false;
+    nativeCalcRestorePending = false;
+    z80.reset();
+    tapeIndex = 0;
+    pagingLatch = 0;
+    pagingLocked = false;
+    ayRegister = 0;
+    ayRegisters.fill(0);
+    ayChip.reset();
+    ayLog = [];
+    speakerLog = [];
+    lastSpeakerState = 0;
+    nextAudioTime = audioCtx ? audioCtx.currentTime : 0;
+    releaseAllKeys();
+    isRunning = true;
+    if(animationFrameId) cancelAnimationFrame(animationFrameId);
+    container.focus();
+    monitor.style.borderColor = '#333a36';
+    loop();
+    log('128K ready. Insert a tape, then select Tape Loader from the Spectrum menu.', 'normal');
+}
+
+let frameTStates = 0;
+
+async function prepareNativeCalculator() {
+    if (nativeCalcProgram.base64) return;
+    try {
+        const response = await fetch('native-calc/program.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        nativeCalcProgram = await response.json();
+    } catch (error) {
+        log(`Native calculator unavailable: ${error.message}`, 'error');
+    }
+}
+
+function startNativeCalculator(state) {
+    const bytes = decodeBase64ToBytes(nativeCalcProgram.base64);
+    nativeCalcContext = {
+        state, banks: ramBanks.map(bank => bank.slice()),
+        latch: pagingLatch, locked: pagingLocked, border: monitor.style.borderColor
+    };
+    nativeCalcExitRequested = false;
+    nativeCalcMouse = { x:0, y:0, targetX:0, targetY:0, rawX:0, rawY:0, left:false, reported:0xFF, cancelled:false };
+    canvas.style.cursor = 'crosshair';
+    nativeCalcRestorePending = true;
+    pagingLatch = 0x10;
+    pagingLocked = false;
+    for (let i = 0; i < bytes.length; i++) writeMemory(nativeCalcProgram.origin + i, bytes[i]);
+    releaseAllKeys();
+    z80.setState({ ...state, pc: nativeCalcProgram.origin, sp: 0xFF00, iy: 0x5C3A,
+        iff1: 0, iff2: 0, halted: false, do_delayed_ei: false, do_delayed_di: false });
+    log('Spectrum Calc: arrows move; Enter edits; drag the cell corner to fill; F4 lists formulas; F5 fills with the keyboard.', 'success');
+}
+
+function finishNativeCalculator() {
+    if (readMemory(nativeCalcProgram.ready)) {
+        nativeCalcSavedCells = Uint8Array.from({ length: nativeCalcProgram.cellBytes }, (_, i) => readMemory(nativeCalcProgram.cells + i));
+    }
+    const context = nativeCalcContext;
+    context.banks.forEach((bank, i) => ramBanks[i].set(bank));
+    pagingLatch = context.latch;
+    pagingLocked = context.locked;
+    const state = context.state;
+    state.sp = (state.sp - 2) & 0xFFFF;
+    writeMemory(state.sp, 0x53);
+    writeMemory((state.sp + 1) & 0xFFFF, 0x26);
+    state.pc = 0x2704;
+    nativeCalcContext = null;
+    nativeCalcMouse = null;
+    canvas.style.cursor = '';
+    nativeCalcExitRequested = false;
+    nativeCalcRestorePending = false;
+    releaseAllKeys();
+    z80.setState(state);
+    monitor.style.borderColor = context.border;
+    log('Spectrum menu. Your spreadsheet is kept in memory for this session.', 'normal');
+}
+
+// Translate PC typing to real Spectrum matrix chords. The Z80 program still
+// reads the hardware keyboard and parses every character and formula itself.
+function handleNativeCalcKey(event, pressed) {
+    const id = event.code || event.key;
+    if (!pressed) nativeCalcKeys.delete(id);
+    else {
+        let codes;
+        const symbols = { '=': 'KeyL', '+': 'KeyK', '-': 'KeyJ', '*': 'KeyB', '/': 'KeyV',
+            ':': 'KeyZ', '.': 'KeyM', ',': 'KeyN', '(': 'Digit8', ')': 'Digit9',
+            '$': 'Digit4', ';': 'KeyO', '"': 'KeyP', '^': 'KeyH' };
+        if (symbols[event.key]) codes = ['ShiftLeft', symbols[event.key]];
+        else if (event.key === 'Escape') codes = ['ControlLeft', 'Space'];
+        else if (event.key === 'Backspace' || event.key === 'Delete') codes = ['ControlLeft', 'Digit0'];
+        else if (event.key === 'Tab') codes = ['ControlLeft', event.shiftKey ? 'Digit5' : 'Digit8'];
+        else if (event.key === 'F4') codes = ['ShiftLeft', 'KeyE'];
+        else if (event.key === 'F5') codes = ['ShiftLeft', 'KeyF'];
+        else if (event.key.startsWith('Arrow')) codes = ['ControlLeft', { ArrowLeft:'Digit5', ArrowRight:'Digit8', ArrowUp:'Digit7', ArrowDown:'Digit6' }[event.key]];
+        else if (event.key === 'Shift') codes = [];
+        else if (/^[A-Z]$/.test(event.key)) codes = ['ControlLeft', event.code];
+        else if (keyMapByCode[event.code]) codes = [event.code];
+        else return false;
+        nativeCalcKeys.set(id, codes.map(code => keyMapByCode[code]).filter(Boolean));
+    }
+    for (const row in keyboard) keyboard[row] = 0x1F;
+    for (const keys of nativeCalcKeys.values()) for (const [row, mask] of keys) keyboard[row] &= ~mask;
+    event.preventDefault();
+    return true;
+}
+
+function loop() {
+    if (!isRunning) return;
+
+    // --- AUDIO SYNC LOCK ---
+    // If we have audio enabled, we MUST NOT run faster than the audio hardware.
+    // If the next audio chunk is scheduled > 40ms in the future, we are running too fast.
+    // We skip this visual frame to let the audio "catch up".
+    if (audioCtx && audioCtx.state === 'running' && (nextAudioTime - audioCtx.currentTime) > 0.04) {
+        animationFrameId = requestAnimationFrame(loop);
+        return;
+    }
+
+    frameTStates = 0;
+    speakerLog = [];
+    ayLog = [];
+
+    while (frameTStates < FRAME_TSTATES) {
+        const state = z80.getState();
+        if (calculatorHookSupported && !(pagingLatch & 0x10) && state.pc === 0x2885) {
+            startNativeCalculator(state);
+            continue;
+        }
+        if (nativeCalcContext && nativeCalcRestorePending && state.pc === nativeCalcProgram.main) {
+            if (nativeCalcSavedCells) {
+                for (let i = 0; i < nativeCalcSavedCells.length; i++) writeMemory(nativeCalcProgram.cells + i, nativeCalcSavedCells[i]);
+                writeMemory(nativeCalcProgram.initialized, 1);
+            }
+            nativeCalcRestorePending = false;
+        }
+        if (nativeCalcContext && nativeCalcExitRequested) {
+            finishNativeCalculator();
+            continue;
+        }
+        // Let LD-BYTES run its prologue, then trap the first tape read. Loaders
+        // such as Exolon's enter here directly with A/carry already in AF'.
+        // Keeping the ROM's stack setup also preserves its border/EI epilogue.
+        if (state.pc === 0x0562 && tapeBuffer && ((pagingLatch >> 4) & 1) === 1) {
+            handleTapeLoad();
+            frameTStates += 10; // Account for the shortcut's RET.
+            continue;
+        }
+        frameTStates += z80.run_instruction();
+    }
+
+    z80.interrupt(false, 0);
+    renderScreen();
+    processAudioFrame(speakerLog);
+
+    animationFrameId = requestAnimationFrame(loop);
+}
+
+function handleTapeLoad() {
+    const state = z80.getState();
+    const currentTapePos = tapeIndex;
+
+    if (!tapeBuffer || currentTapePos >= tapeBuffer.byteLength) {
+        log("Tape End.", 'error');
+        returnFromTrap(state, false);
+        return;
+    }
+
+    const view = new DataView(tapeBuffer);
+    if (currentTapePos + 2 > tapeBuffer.byteLength) { returnFromTrap(state, false); return; }
+    const blockLen = view.getUint16(currentTapePos, true);
+    if (blockLen < 2 || currentTapePos + 2 + blockLen > tapeBuffer.byteLength) { returnFromTrap(state, false); return; }
+
+    const flagByte = view.getUint8(currentTapePos + 2);
+    const dataPtr = currentTapePos + 3;
+    const payloadLen = blockLen - 2;
+    tapeIndex += blockLen + 2;
+
+    // At 0562 the ROM has exchanged AF with AF': the expected flag and
+    // LOAD (carry set) / VERIFY (carry clear) request live in the alternate set.
+    if (flagByte !== state.a_prime) {
+        returnFromTrap(state, false);
+        return;
+    }
+
+    const reqLen = (state.d << 8) | state.e;
+    const bytesToCopy = Math.min(payloadLen, reqLen);
+    let checksum = flagByte;
+    let transferred = 0;
+    for (; transferred < bytesToCopy; transferred++) {
+        const value = view.getUint8(dataPtr + transferred);
+        const addr = (state.ix + transferred) & 0xFFFF;
+        checksum ^= value;
+        if (state.flags_prime.C) writeMemory(addr, value);
+        else if (readMemory(addr) !== value) break;
+    }
+
+    state.ix = (state.ix + transferred) & 0xFFFF;
+    const remaining = reqLen - transferred;
+    state.d = (remaining >> 8) & 0xFF;
+    state.e = remaining & 0xFF;
+    // The next byte after the requested data is the ROM's parity byte.
+    checksum ^= view.getUint8(dataPtr + bytesToCopy);
+    state.a = state.h = checksum;
+    const success = remaining === 0 && checksum === 0;
+    returnFromTrap(state, success);
+    log(success ? 'Block Loaded.' : 'Tape loading error.', success ? 'success' : 'error');
+}
+
+function returnFromTrap(state, success) {
+    let retAddr = readMemory(state.sp) | (readMemory((state.sp + 1) & 0xFFFF) << 8);
+    state.sp = (state.sp + 2) & 0xFFFF;
+    state.pc = retAddr;
+
+    if (success) {
+        if(state.flags) { state.flags.C = 1; }
+        if(state.f !== undefined) { state.f |= 1; }
+    } else {
+        if(state.flags) { state.flags.C = 0; }
+        if(state.f !== undefined) { state.f &= ~1; }
+    }
+
+    z80.setState(state);
+}
+
+function renderScreen() {
+    const screenBank = (pagingLatch & 0x08) ? 7 : 5;
+    for (let y = 0; y < 192; y++) {
+        const vAddr = 0x4000 | ((y & 0xC0) << 5) | ((y & 0x38) << 2) | ((y & 0x07) << 8);
+        const aAddr = 0x5800 | ((y >> 3) << 5);
+        for (let xByte = 0; xByte < 32; xByte++) {
+            const pixelByte = ramBanks[screenBank][vAddr + xByte - 0x4000];
+            const attrByte = ramBanks[screenBank][aAddr + xByte - 0x4000];
+            const ink = (attrByte & 7) + ((attrByte & 64) >> 3);
+            const paper = ((attrByte & 56) >> 3) + ((attrByte & 64) >> 3);
+            const flash = (attrByte & 128) && (Math.floor(Date.now() / 320) % 2 === 0);
+            const c0 = PALETTE_INT[flash ? ink : paper];
+            const c1 = PALETTE_INT[flash ? paper : ink];
+            for (let bit = 0; bit < 8; bit++) {
+                pixels[(y * 256) + (xByte * 8) + bit] = (pixelByte & (128 >> bit)) ? c1 : c0;
+            }
+        }
+    }
+    ctx.putImageData(imgData, 0, 0);
+}
+
+const keyMapByCode = {
+    ControlLeft: [0xFEFE, 0x01], ControlRight: [0xFEFE, 0x01],
+    ShiftLeft: [0x7FFE, 0x02], ShiftRight: [0x7FFE, 0x02],
+    KeyZ: [0xFEFE, 0x02], KeyX: [0xFEFE, 0x04], KeyC: [0xFEFE, 0x08], KeyV: [0xFEFE, 0x10],
+    KeyA: [0xFDFE, 0x01], KeyS: [0xFDFE, 0x02], KeyD: [0xFDFE, 0x04], KeyF: [0xFDFE, 0x08], KeyG: [0xFDFE, 0x10],
+    KeyQ: [0xFBFE, 0x01], KeyW: [0xFBFE, 0x02], KeyE: [0xFBFE, 0x04], KeyR: [0xFBFE, 0x08], KeyT: [0xFBFE, 0x10],
+    Digit1: [0xF7FE, 0x01], Digit2: [0xF7FE, 0x02], Digit3: [0xF7FE, 0x04], Digit4: [0xF7FE, 0x08], Digit5: [0xF7FE, 0x10],
+    Digit0: [0xEFFE, 0x01], Digit9: [0xEFFE, 0x02], Digit8: [0xEFFE, 0x04], Digit7: [0xEFFE, 0x08], Digit6: [0xEFFE, 0x10],
+    KeyP: [0xDFFE, 0x01], KeyO: [0xDFFE, 0x02], KeyI: [0xDFFE, 0x04], KeyU: [0xDFFE, 0x08], KeyY: [0xDFFE, 0x10],
+    Enter: [0xBFFE, 0x01], NumpadEnter: [0xBFFE, 0x01], KeyL: [0xBFFE, 0x02], KeyK: [0xBFFE, 0x04], KeyJ: [0xBFFE, 0x08], KeyH: [0xBFFE, 0x10],
+    Space: [0x7FFE, 0x01], KeyM: [0x7FFE, 0x04], KeyN: [0x7FFE, 0x08], KeyB: [0x7FFE, 0x10]
+};
+
+const cursorKeyMapByCode = {
+    ArrowLeft: [0xF7FE, 0x10],
+    ArrowDown: [0xEFFE, 0x10],
+    ArrowUp: [0xEFFE, 0x08],
+    ArrowRight: [0xEFFE, 0x04]
+};
+const cursorKeyMapByKey = {
+    ArrowLeft: cursorKeyMapByCode.ArrowLeft,
+    ArrowDown: cursorKeyMapByCode.ArrowDown,
+    ArrowUp: cursorKeyMapByCode.ArrowUp,
+    ArrowRight: cursorKeyMapByCode.ArrowRight
+};
+const cursorKeysPressed = new Set();
+
+// Fallback for environments where KeyboardEvent.code is unavailable.
+const keyMapByKey = {
+    'Control': [0xFEFE, 0x01], 'Shift': [0x7FFE, 0x02],
+    'z': [0xFEFE, 0x02], 'x': [0xFEFE, 0x04], 'c': [0xFEFE, 0x08], 'v': [0xFEFE, 0x10],
+    'a': [0xFDFE, 0x01], 's': [0xFDFE, 0x02], 'd': [0xFDFE, 0x04], 'f': [0xFDFE, 0x08], 'g': [0xFDFE, 0x10],
+    'q': [0xFBFE, 0x01], 'w': [0xFBFE, 0x02], 'e': [0xFBFE, 0x04], 'r': [0xFBFE, 0x08], 't': [0xFBFE, 0x10],
+    '1': [0xF7FE, 0x01], '2': [0xF7FE, 0x02], '3': [0xF7FE, 0x04], '4': [0xF7FE, 0x08], '5': [0xF7FE, 0x10],
+    '0': [0xEFFE, 0x01], '9': [0xEFFE, 0x02], '8': [0xEFFE, 0x04], '7': [0xEFFE, 0x08], '6': [0xEFFE, 0x10],
+    'p': [0xDFFE, 0x01], 'o': [0xDFFE, 0x02], 'i': [0xDFFE, 0x04], 'u': [0xDFFE, 0x08], 'y': [0xDFFE, 0x10],
+    'Enter': [0xBFFE, 0x01], 'l': [0xBFFE, 0x02], 'k': [0xBFFE, 0x04], 'j': [0xBFFE, 0x08], 'h': [0xBFFE, 0x10],
+    ' ': [0x7FFE, 0x01], 'm': [0x7FFE, 0x04], 'n': [0x7FFE, 0x08], 'b': [0x7FFE, 0x10]
+};
+
+function resolveSpectrumKey(e) {
+    if (e.code && keyMapByCode[e.code]) return keyMapByCode[e.code];
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    return keyMapByKey[k];
+}
+
+function resolveSpectrumCursorKey(e) {
+    if (e.code && cursorKeyMapByCode[e.code]) return cursorKeyMapByCode[e.code];
+    return cursorKeyMapByKey[e.key];
+}
+
+function releaseAllKeys() {
+    cursorKeysPressed.clear();
+    nativeCalcKeys.clear();
+    keyboard[0xFEFE] = 0x1F;
+    keyboard[0xFDFE] = 0x1F;
+    keyboard[0xFBFE] = 0x1F;
+    keyboard[0xF7FE] = 0x1F;
+    keyboard[0xEFFE] = 0x1F;
+    keyboard[0xDFFE] = 0x1F;
+    keyboard[0xBFFE] = 0x1F;
+    keyboard[0x7FFE] = 0x1F;
+}
+
+window.addEventListener('keydown', (e) => {
+    if (samplesMenu.classList.contains('active') || aboutModal.classList.contains('active')) return;
+    if (e.key === 'F1') { e.preventDefault(); toggleKeyboard(); return; }
+    if (e.key === 'F2') { e.preventDefault(); toggleFullscreen(); return; }
+    if (e.key === 'F3') { e.preventDefault(); toggleLargeView(); return; }
+    if (nativeCalcContext && document.activeElement === container && handleNativeCalcKey(e, true)) return;
+    if (e.key === 'Escape' && !document.getElementById('keyboardOverlay').hidden) { e.preventDefault(); toggleKeyboard(); return; }
+    if (document.activeElement !== container || !z80) return;
+    const cursorKey = resolveSpectrumCursorKey(e);
+    if (cursorKey) {
+        cursorKeysPressed.add(e.code || e.key);
+        keyboard[0xFEFE] &= ~0x01;
+        keyboard[cursorKey[0]] &= ~cursorKey[1];
+        e.preventDefault();
+        return;
+    }
+    let k = resolveSpectrumKey(e);
+    if (k) { keyboard[k[0]] &= ~k[1]; e.preventDefault(); }
+});
+window.addEventListener('keyup', (e) => {
+    if (document.activeElement !== container) return;
+    if (nativeCalcContext && handleNativeCalcKey(e, false)) return;
+    const cursorKey = resolveSpectrumCursorKey(e);
+    if (cursorKey) {
+        keyboard[cursorKey[0]] |= cursorKey[1];
+        cursorKeysPressed.delete(e.code || e.key);
+        if (cursorKeysPressed.size === 0 && !e.ctrlKey) keyboard[0xFEFE] |= 0x01;
+        e.preventDefault();
+        return;
+    }
+    let k = resolveSpectrumKey(e);
+    if (k && !(k[0] === 0xFEFE && (k[1] & 0x01) && cursorKeysPressed.size > 0)) {
+        keyboard[k[0]] |= k[1];
+    }
+});
+window.addEventListener('blur', releaseAllKeys);
+container.addEventListener('pointerdown', () => container.focus());
+function updateNativeCalcPointer(event, pressed) {
+    if (!nativeCalcMouse || !readMemory(nativeCalcProgram.ready)) return false;
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    nativeCalcMouse.targetX = Math.max(0, Math.min(255, Math.floor((event.clientX - rect.left) * 256 / rect.width)));
+    nativeCalcMouse.targetY = Math.max(0, Math.min(191, Math.floor((event.clientY - rect.top) * 192 / rect.height)));
+    const x = nativeCalcMouse.targetX, y = nativeCalcMouse.targetY;
+    const help = readMemory(nativeCalcProgram.helpActive);
+    const editing = readMemory(nativeCalcProgram.editing);
+    const filling = readMemory(nativeCalcProgram.fillMode);
+    const toolbar = y >= 24 && y < 32 && (x < 44 || (x >= 48 && x < 92) || (!editing && !filling && ((x >= 96 && x < 192) || x >= 200)));
+    const paging = y >= 168 && y < 176 && (x < 12 || (x >= 32 && x < 44) || (x >= 128 && x < 184) || x >= 192);
+    canvas.style.cursor = help ? (y >= 184 ? 'pointer' : 'default')
+        : toolbar || paging ? 'pointer' : (y >= 8 && y < 16) || editing ? 'text' : 'crosshair';
+    if (pressed !== undefined) nativeCalcMouse.left = pressed;
+    return true;
+}
+canvas.addEventListener('pointerdown', event => {
+    if (event.button !== 0 || !updateNativeCalcPointer(event, true)) return;
+    container.focus();
+    canvas.setPointerCapture(event.pointerId);
+    event.preventDefault();
+});
+canvas.addEventListener('pointermove', event => { updateNativeCalcPointer(event); });
+canvas.addEventListener('pointerup', event => {
+    if (event.button !== 0 || !updateNativeCalcPointer(event, false)) return;
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    event.preventDefault();
+});
+function cancelNativeCalcPointer() {
+    if (nativeCalcMouse && nativeCalcMouse.left) {
+        nativeCalcMouse.left = false;
+        nativeCalcMouse.cancelled = true;
+    }
+}
+canvas.addEventListener('pointercancel', cancelNativeCalcPointer);
+canvas.addEventListener('lostpointercapture', cancelNativeCalcPointer);
+window.addEventListener('blur', cancelNativeCalcPointer);
+container.addEventListener('blur', releaseAllKeys);
+container.addEventListener('focus', () => {
+    document.getElementById('focusHint').lastChild.textContent = 'Keyboard connected';
+});
+container.addEventListener('blur', () => {
+    document.getElementById('focusHint').lastChild.textContent = 'Click the display to type';
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAllKeys(); });
+
+document.getElementById('romFile').addEventListener('change', (e) => {
+    const input = e.target;
+    if (!input.files || !input.files.length) return;
+    try {
+        enableAudio();
+    } catch (error) {
+        audioUnavailable = true;
+        updateAudioButton();
+        log(`Could not initialize audio: ${error.message}`, 'error');
+    }
+    readRomFiles(input.files)
+        .then(async (romFiles) => {
+            await prepareNativeCalculator();
+            loadRomSet(romFiles);
+            initZ80();
+        })
+        .catch((err) => log(`ROM load failed: ${err.message}`, 'error'))
+        .finally(() => { input.value = ''; });
+});
+document.getElementById('btnLoad128').addEventListener('click', loadBuiltIn128K);
+document.getElementById('tapFile').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    loadTapeFile(file);
+    e.target.value = '';
+});
+
+function loadTapeFile(file) {
+    if (!file) return;
+    if (!z80) { log('Start the Spectrum 128K before loading a tape.', 'error'); return; }
+    if (!isTapFileName(file.name)) {
+        log(TAP_ONLY_MSG, 'error');
+        return;
+    }
+
+    const r = new FileReader();
+    r.onload = (ev) => { setTapeBuffer(ev.target.result, file.name); container.focus(); };
+    r.onerror = () => log(`Could not read ${file.name}. Try choosing the file again.`, 'error');
+    r.readAsArrayBuffer(file);
+}
+
+const tapeDeck = document.getElementById('tapeDeck');
+tapeDeck.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (z80) tapeDeck.classList.add('is-dragging');
+});
+tapeDeck.addEventListener('dragleave', (e) => {
+    if (!tapeDeck.contains(e.relatedTarget)) tapeDeck.classList.remove('is-dragging');
+});
+tapeDeck.addEventListener('drop', (e) => {
+    e.preventDefault();
+    tapeDeck.classList.remove('is-dragging');
+    loadTapeFile(e.dataTransfer.files[0]);
+});
+
+function updateFullscreenButton(active) {
+    btnFullscreen.innerHTML = `<svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 2H2v5m11-5h5v5M2 13v5h5m11-5v5h-5"/></svg>${active ? 'Windowed' : 'Fullscreen'} <span class="shortcut-badge">F2</span>`;
+    btnFullscreen.setAttribute('aria-pressed', String(active));
+}
+function handleFullscreenStateChanged() {
+    const active = getFullscreenElement() === monitor;
+    monitor.classList.toggle('is-fullscreen', active);
+    updateFullscreenButton(active);
+    updateLargeViewButtonState(active);
+    syncDisplayScale();
+    container.focus();
+}
+document.addEventListener('fullscreenchange', handleFullscreenStateChanged);
+document.addEventListener('webkitfullscreenchange', handleFullscreenStateChanged);
+window.addEventListener('resize', syncDisplayScale);
+monitor.classList.remove('is-fullscreen');
+updateFullscreenButton(false);
+updateLargeViewButtonState(false);
+syncDisplayScale();
+document.getElementById('btnReset').addEventListener('click', resetSystem);
+document.getElementById('btnAudio').addEventListener('click', toggleAudioMute);
+btnLargeView.addEventListener('click', () => {
+    toggleLargeView();
+});
+btnSamples.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSamplesMenu();
+});
+btnSamplesClose.addEventListener('click', () => {
+    closeSamplesMenu();
+    container.focus();
+});
+btnAbout.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openAbout();
+});
+btnAboutClose.addEventListener('click', closeAbout);
+aboutModal.addEventListener('click', (e) => {
+    if (e.target === aboutModal) closeAbout();
+});
+sampleSelect.addEventListener('change', handleSampleSelection);
+samplesMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (e.target === samplesMenu) { closeSamplesMenu(); btnSamples.focus(); }
+});
+document.addEventListener('click', () => {
+    if (samplesMenu.classList.contains('active')) closeSamplesMenu();
+});
+document.addEventListener('keydown', (e) => {
+    const dialog = !aboutModal.hidden ? aboutModal : (!samplesMenu.hidden ? samplesMenu : null);
+    if (dialog && e.key === 'Tab') {
+        const focusable = [...dialog.querySelectorAll('button:not(:disabled), a[href], select:not(:disabled)')];
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    if (e.key === 'Escape' && aboutModal.classList.contains('active')) {
+        closeAbout();
+        return;
+    }
+    if (e.key === 'Escape' && samplesMenu.classList.contains('active')) {
+        closeSamplesMenu();
+        btnSamples.focus();
+    }
+});
+updateAudioButton();
+</script>
+</body>
+</html>
