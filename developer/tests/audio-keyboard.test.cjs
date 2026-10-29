@@ -93,12 +93,16 @@ test('AY writes retain their timing within the Web Audio output buffer', async (
         processAudioFrame([]);
         const data = audioCtx.lastBuffer.getChannelData(0);
         return { length: data.length, firstRange: Math.max(...data.slice(0,440)) - Math.min(...data.slice(0,440)),
-            secondRange: Math.max(...data.slice(442)) - Math.min(...data.slice(442)),
+            tail: data.slice(440),
             starts: audioCtx.starts.length };
     })()`);
     assert.equal(result.length, 882);
     assert.ok(result.firstRange > 0.1);
-    assert.equal(result.secondRange, 0);
+    // Muting the AY at the halfway write leaves only the DC blocker's decay.
+    const pole = Math.exp(-2 * Math.PI * 20 / 44100);
+    for (let i = 1; i < result.tail.length; i++) {
+        assert.ok(Math.abs(result.tail[i] - result.tail[i - 1] * pole) < 1e-8);
+    }
     assert.ok(result.starts >= 2);
 });
 
